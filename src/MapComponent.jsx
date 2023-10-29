@@ -1,22 +1,33 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, Polygon, LoadScript } from "@react-google-maps/api";
 
-const MapComponent = ({ onPolygonComplete, apiKey }) => {
+const MapComponent = ({ onPolygonComplete, apiKey, boundariesData }) => {
+  // console.log('ddd', boundariesData)
   const [path, setPath] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [drawingMode, setDrawingMode] = useState(false);
   const [drawingInProgress, setDrawingInProgress] = useState(false);
   const hasLoaded = useRef(false);
+ 
+  // Initialize the state with boundariesData when it's available
+  useEffect(() => {
+    if (boundariesData) {
+      setPolygons(boundariesData);
+    }
+  }, [boundariesData, polygons]);
+
 
   const startDrawing = () => {
     setDrawingInProgress(true);
     setPath([]);
   };
 
-  const finishDrawing = () => {
+  const finishDrawing = (firstCords) => {
     if (drawingInProgress) {
       setDrawingInProgress(false);
+      path.push(path[0])
       setPolygons([...polygons, path]);
+      
       onPolygonComplete(path);
     }
   };
@@ -60,15 +71,25 @@ const MapComponent = ({ onPolygonComplete, apiKey }) => {
   return (
     <LoadScript googleMapsApiKey={apiKey}>
       <GoogleMap
+        key={boundariesData.length}
         mapContainerStyle={{ width: "100%", height: "400px" }}
-        zoom={10}
-        center={{ lat: -3.745, lng: -38.523 }}
+        zoom={22}
+        center={{ lat: -3.909050573693678, lng: -39.13905835799129 }}
         onClick={handleMapClick}
         onDblClick={handleDoubleClick}
       >
-        {polygons.map((polygon, index) => (
-          <Polygon key={index} path={polygon} />
-        ))}
+      { 
+        //!drawingInProgress && console.log('pp', polygons.length, polygons, boundariesData.length === polygons.length) 
+      }
+      {polygons.length > 0 && (boundariesData.length === polygons.length) && polygons.map((requestData, index) => (
+        <>
+          { // console.log('coming', requestData)
+          }
+          <Polygon key={index} path={requestData} />
+        </>
+
+      ))}
+        
         {drawingInProgress && path.length > 0 && (
           <Polygon path={path} />
         )}
