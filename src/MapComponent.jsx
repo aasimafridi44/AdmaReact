@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, Polygon, LoadScript } from "@react-google-maps/api";
+import { LensTwoTone } from "@mui/icons-material";
 
-const MapComponent = ({ onPolygonComplete, apiKey, boundariesData }) => {
-  // console.log('ddd', boundariesData)
+const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField }) => {
+  // console.log('ddd', clickedField)
   const [path, setPath] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [drawingMode, setDrawingMode] = useState(false);
   const [drawingInProgress, setDrawingInProgress] = useState(false);
   const hasLoaded = useRef(false);
+  const currentPath = useRef([]);
+
+  //const currentPath = paths[paths.length - 1];
  
   // Initialize the state with boundariesData when it's available
   useEffect(() => {
@@ -22,12 +26,12 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData }) => {
     setPath([]);
   };
 
-  const finishDrawing = (firstCords) => {
+  const finishDrawing = () => {
     if (drawingInProgress) {
       setDrawingInProgress(false);
       path.push(path[0])
       setPolygons([...polygons, path]);
-      
+      currentPath.current.push(path)
       onPolygonComplete(path);
     }
   };
@@ -71,7 +75,7 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData }) => {
   return (
     <LoadScript googleMapsApiKey={apiKey}>
       <GoogleMap
-        key={boundariesData.length}
+        key={clickedField.id}
         mapContainerStyle={{ width: "100%", height: "400px" }}
         zoom={22}
         center={{ lat: -3.909050573693678, lng: -39.13905835799129 }}
@@ -81,11 +85,11 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData }) => {
       { 
         //!drawingInProgress && console.log('pp', polygons.length, polygons, boundariesData.length === polygons.length) 
       }
-      {polygons.length > 0 && (boundariesData.length === polygons.length) && polygons.map((requestData, index) => (
+      {!drawingInProgress && polygons.length > 0 && polygons.map((requestData, index) => (
         <>
-          { // console.log('coming', requestData)
+          {  //console.log('coming', index)
           }
-          <Polygon key={index} path={requestData} />
+          <Polygon key={clickedField.id + index} path={requestData} />
         </>
 
       ))}

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import MapComponent from './MapComponent'
-import { Container } from '@mui/material';
+import { Container, CircularProgress } from '@mui/material';
 import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import fieldsData from './data/fields.json';
 import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray} from './data/token';
 
 
@@ -17,6 +16,7 @@ function App() {
   const [farms, setFarms] = useState([]);
   const [selectedFarm, setSelectedFarm] = useState(null);
   const [selectedField, setSelectedField] = useState(null);
+  const [loading, setLoading] = useState(true);
   
   const handlePartySelect = (party) => {
     setSelectedParty(party);
@@ -37,10 +37,10 @@ function App() {
 
     axios.get(endPoint+ '/parties/'+ selectedParty.id +'/boundaries?api-version=2023-06-01-preview', { headers })
     .then((response) => {
-       // setPolygonData(response);
+       setLoading(false);
        const result = response.data.value;       
        const boundariesData = result.filter((boundary) => boundary.parentId === field.id).map((boundary) => boundary.id);
-       console.log('boundariesData', field.id ,boundariesData)
+       // console.log('boundariesData', field.id ,boundariesData)
       
        if(boundariesData.length > 0) {
           // Create an array of Axios request promises
@@ -51,6 +51,7 @@ function App() {
           // Use axios.all() to make multiple requests in parallel
           axios.all(requestPromises)
           .then((responses) => {
+            setLoading(false);
             // Handle the responses here
             let coordinatesData = responses.map((response) => {
               return response?.data?.geometry?.coordinates
@@ -59,23 +60,26 @@ function App() {
             setPolygonData(coordinatesData);
           })
           .catch((error) => {
+            setLoading(false);
             // Handle any errors that occurred during the requests
             console.error('One or more requests failed:', error);
           });
        }        
     })
     .catch((error) => {
+      setLoading(false);
       console.error('Error fetching party data:', error);
     });
   };
 
   const handlePolygonComplete = (data) => {
     setPolygonData(data);
+    console.log('finish drwaing' , data)
   };
   
   const googleMapsApiKey = "AIzaSyADpUeiQiPTYYvsqwbVLiJWoSv0tf3fEVs";
 
-  const sendDataToAPI = async (selectedPartyid) => {
+  const sendDataToAPI = async () => {
     try {
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
@@ -94,11 +98,14 @@ function App() {
       
       axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
       .then((response) => {
+        setLoading(false);
       }).catch((error) => {
+        setLoading(false);
         console.error('boundaries create failed:', error);
       })
 
     } catch (error) {
+      setLoading(false);
       console.error("Error sending data to the API:", error);
     }
   };
@@ -108,11 +115,11 @@ function App() {
     <Container>
       <PartyList onPartySelect={handlePartySelect} />
       {selectedParty && <FarmList selectedParty={selectedParty} farms={farms} onFarmSelect={handleFarmSelect} />}
-      {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} fields={fieldsData} onFieldSelect={handleFieldSelect} />}
+      {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} onFieldSelect={handleFieldSelect} />}
       {selectedField && (
                     <div>
-                      <h1>Google Map Polygon Drawing</h1>
-                        <MapComponent onPolygonComplete={handlePolygonComplete} apiKey={googleMapsApiKey} boundariesData = {polygonData} />
+                      <h4>Draw boundaries</h4>
+                        <MapComponent onPolygonComplete={handlePolygonComplete} apiKey={googleMapsApiKey} boundariesData = {polygonData} clickedField={selectedField} />
                       <button onClick={sendDataToAPI}>Send Data to API</button>
                     </div>
       )}
