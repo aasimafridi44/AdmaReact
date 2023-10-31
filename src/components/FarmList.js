@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { List, ListItem, ListItemText, Typography, CircularProgress } from '@mui/material';
-import { endPoint, headers } from '../data/token';
+import { endPoint, headers } from '../data/utils';
 
 
 function FarmList({ selectedParty, farms, onFarmSelect }) {
