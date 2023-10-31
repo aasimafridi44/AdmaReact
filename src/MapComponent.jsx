@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { GoogleMap, Polygon, LoadScript } from "@react-google-maps/api";
-import { LensTwoTone } from "@mui/icons-material";
+
 
 const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField }) => {
-  // console.log('ddd', clickedField)
   const [path, setPath] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -11,7 +10,6 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
   const hasLoaded = useRef(false);
   const currentPath = useRef([]);
 
-  //const currentPath = paths[paths.length - 1];
  
   // Initialize the state with boundariesData when it's available
   useEffect(() => {

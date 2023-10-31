@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { List, ListItem, ListItemText, Typography, Box, CircularProgress } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Typography, CircularProgress, Box } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { endPoint, headers } from '../data/utils';
 
 
@@ -8,6 +9,7 @@ function PartyList({ onPartySelect }) {
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedParty, setSelectedParty] = useState(null);
+  const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
     axios.get(endPoint+'/parties?api-version=2022-11-01-preview', { headers })
@@ -22,35 +24,37 @@ function PartyList({ onPartySelect }) {
   }, []);
 
   const handlePartyClick = (party) => {
-    setSelectedParty(party);
     onPartySelect(party);
+    setSelectedParty(party);
+    setExpanded(!expanded);
+  };
+  const handleToggleExpand = () => {
+    setExpanded(!expanded);
   };
 
   return (
     <>
-      <Typography variant="h5">
-        List of Parties
-      </Typography>
-      {loading ? (
+     <Accordion expanded={expanded} onChange={handleToggleExpand}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h5">List of Parties</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        {loading ? (
         <CircularProgress /> // Display a loader while loading data
-      ) : (
-        <List>
-          {parties.map((party) => (
-              <Box
-                  key={party.id}
-                  borderRadius={4}
-                  p={0}
-                  m={0}
-                  onClick = {() =>  handlePartyClick(party)}
-                  style = {{ background: selectedParty === party ? 'lightblue' : 'white' }}
+        ) : (
+          parties.map((party) => (
+              
+            <Box 
+               key={party.id}
+               onClick={() => handlePartyClick(party)}
               >
-              <ListItem>
-                <ListItemText primary={party.name} secondary={party.date} style={{ cursor: 'pointer' }} />
-              </ListItem>
-            </Box>
-          ))}
-        </List>
-      )}
+                <Typography style={{ cursor: 'pointer',  background: selectedParty === party ? 'lightblue' : 'white' }}>{party.name}</Typography>
+              </Box>
+        ))
+        )
+        }
+        </AccordionDetails>
+     </Accordion>
     </>
   );
 }
