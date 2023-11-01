@@ -36,7 +36,7 @@ function PartyList({ onPartySelect }) {
     <>
      <Accordion expanded={expanded} onChange={handleToggleExpand}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">List of Parties</Typography>
+            <Typography variant="h6">List of Parties</Typography>
         </AccordionSummary>
         <AccordionDetails>
         {loading ? (

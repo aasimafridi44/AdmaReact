@@ -2,8 +2,9 @@
 
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { List, ListItem, ListItemText, Typography, CircularProgress } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress } from '@mui/material';
 import { endPoint, headers } from '../data/utils';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
 function FarmList({ selectedParty, farms, onFarmSelect }) {
@@ -11,6 +12,7 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
  const [farmsData, setFarmsData] = useState([]);
  const [loading, setLoading] = useState(true);
  const [selectedFarm, setSelectedFarm] = useState(null);
+ const [expanded, setExpanded] = useState(true);
 
 
   useEffect(() => {   
@@ -28,29 +30,41 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
     const handleFarmClick = (farm) => {
         setSelectedFarm(farm);
         onFarmSelect(farm);
+        setExpanded(!expanded);
+    };
+
+    const handleToggleExpand = () => {
+      setExpanded(!expanded);
     };
 
     const filteredFarms = farmsData.filter((farm) => farm.partyId === selectedParty.id);
 
     return (
-        <div>
+      <Accordion expanded={expanded} onChange={handleToggleExpand}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6">
             List of Farms for {selectedParty.name}
         </Typography>
-        {loading ? (
-        <CircularProgress /> // Display a loader while loading data
-      ) : <List>
-            {filteredFarms.map((farm) => (
-            <ListItem 
+        </AccordionSummary>
+        <AccordionDetails>
+          {loading ? (
+          <CircularProgress /> // Display a loader while loading data
+        ) : 
+              filteredFarms.map((farm) => (
+              <Box 
                 key={farm.id}
                 onClick={() => handleFarmClick(farm)}
-                style={{ background: selectedFarm?.id === farm.id ? 'lightblue' : 'white' , cursor: 'pointer' }}>
-                <ListItemText primary={farm.name} secondary={farm.location} />
-            </ListItem>
-            ))}
-        </List>
-        }
-        </div>
+                padding={1}
+                border={0}
+                borderRadius={4}
+              >
+                <Typography style={{ cursor: 'pointer',  background: selectedFarm?.id === farm.id ? 'lightblue' : 'white' }}>{farm.name}</Typography>
+              </Box> 
+              ))
+          
+          }
+        </AccordionDetails>
+      </Accordion>
     );
 }
 

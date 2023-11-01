@@ -2,13 +2,15 @@
 
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { List, ListItem, ListItemText, Typography, CircularProgress } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { endPoint, headers } from '../data/utils';
 
 function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   const [fieldsData, setfieldsData] = useState([]);
   const [loading, setLoading] = useState(true);
- const [selectedField, setSelectedField] = useState(null);
+  const [selectedField, setSelectedField] = useState(null);
+  const [expanded, setExpanded] = useState(true);
 
 
   useEffect(() => {  
@@ -29,30 +31,39 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   const handleFieldClick = (field, selectedFarm) => {
     setSelectedField(field);
     onFieldSelect(field);
+    setExpanded(!expanded);
+  };
+
+  const handleToggleExpand = () => {
+    setExpanded(!expanded);
   };
 
   //const filteredFields = fieldsData.filter((field) => field.partyId === selectedParty.id);
 
   return (
-    <div>
-      <Typography variant="h6">
-        List of Fields for {selectedFarm.name}
-      </Typography>
+    <Accordion expanded={expanded} onChange={handleToggleExpand}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography variant="h6">
+          List of Fields for {selectedFarm.name}
+        </Typography>
+      </AccordionSummary>
       { loading ? (
         <CircularProgress /> // Display a loader while loading data
-      ) : <List>
-        {fieldsData.map((field) => (
-          <ListItem 
+      ) : 
+        fieldsData.map((field) => (
+          <Box 
                 key={field.id}
+                padding={1}
+                border={0}
                 onClick={() => handleFieldClick(field, selectedFarm)}
                 style={{background: selectedField === field ? 'lightblue' : 'white' ,  cursor: 'pointer' }}
             >
-            <ListItemText primary={field.name} secondary={field.area} />
-          </ListItem>
-        ))}
-      </List>
+            <Typography style={{ cursor: 'pointer',  background: selectedField === field  ? 'lightblue' : 'white' }}>{field.name}</Typography>
+          </Box>
+        ))
+      
       }
-    </div>
+    </Accordion>
   );
 }
 
