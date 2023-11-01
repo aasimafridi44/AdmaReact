@@ -47,6 +47,9 @@ function PartyList({ onPartySelect }) {
             <Box 
                key={party.id}
                onClick={() => handlePartyClick(party)}
+               padding={1}
+               border={0}
+               borderRadius={4}
               >
                 <Typography style={{ cursor: 'pointer',  background: selectedParty === party ? 'lightblue' : 'white' }}>{party.name}</Typography>
               </Box>
