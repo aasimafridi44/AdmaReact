@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary, AccordionDetails, Typography, CircularProgress, Box } from '@mui/material';
+import { Accordion, 
+  AccordionSummary, 
+  AccordionDetails, 
+  Typography, 
+  CircularProgress, 
+  Box,
+  Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { endPoint, headers } from '../data/utils';
 
 
-function PartyList({ onPartySelect }) {
+function PartyList({ onPartySelect, activeStep }) {
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedParty, setSelectedParty] = useState(null);
@@ -26,14 +32,22 @@ function PartyList({ onPartySelect }) {
   const handlePartyClick = (party) => {
     onPartySelect(party);
     setSelectedParty(party);
-    setExpanded(!expanded);
+    //setActiveStep(0);
+    setExpanded(false);
   };
   const handleToggleExpand = () => {
     setExpanded(!expanded);
   };
 
+  const handleStepperReset = () => {
+    onPartySelect(null);
+    setSelectedParty(null);
+    setExpanded(true); // Show the party list
+  };
+  // const steps = ['Party', 'Farm', 'Field']; 
   return (
     <>
+    { activeStep === null &&
      <Accordion expanded={expanded} onChange={handleToggleExpand}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">List of Parties</Typography>
@@ -58,6 +72,15 @@ function PartyList({ onPartySelect }) {
         }
         </AccordionDetails>
      </Accordion>
+      }
+      {selectedParty && (
+        <>
+        <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
+          Party({selectedParty.name})
+          <Button onClick={handleStepperReset}>X</Button>
+        </Box>
+        </>
+      )}
     </>
   );
 }

@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { GoogleMap, Polygon, LoadScript, DrawingManager } from "@react-google-maps/api";
-import { libraries, polygonOptions } from './data/utils'
+import { GoogleMap, Polygon, DrawingManager } from "@react-google-maps/api";
+import { polygonOptions } from './data/utils'
 
 
-const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField }) => {
+const MapComponent = ({ onPolygonComplete, boundariesData, clickedField }) => {
   const [path, setPath] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -72,7 +72,7 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
   };
 
   return (
-    <LoadScript googleMapsApiKey={apiKey} libraries={libraries}>
+    <>
       <GoogleMap
         key={clickedField.id}
         mapContainerStyle={{ width: "100%", height: "600px" }}
@@ -95,36 +95,12 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
         {drawingInProgress && path.length > 0 && (
           <Polygon path={path} />
         )}
-
-        <DrawingManager
-          onPolygonComplete={(polygon) => {
-            if (drawingMode) {
-              // Change polygon colors here
-              polygon.setOptions({
-                fillColor: 'blue', // New fill color during draw time
-                strokeColor: 'red', // New stroke color during draw time
-              });
-              finishDrawing(); // Finish drawing after each polygon is drawn
-            }
-          }}
-          drawingMode={drawingMode ? 'polygon' : null}
-          options={{
-                    drawingControl: true,
-                    drawingControlOptions: {
-                      drawingModes: ['polygon'],
-                    },
-                    polygonOptions: {
-                      fillColor: 'blue', // Initial fill color when drawing
-                      strokeColor: 'red', // Initial stroke color when drawing
-                    },
-                  }}
-        />
       </GoogleMap>
 
       <button onClick={toggleDrawingMode}>
         {drawingMode ? "Finish Drawing" : "Start Drawing"}
       </button>
-    </LoadScript>
+    </>
   );
 };
 

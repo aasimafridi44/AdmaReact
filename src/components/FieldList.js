@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress } from '@mui/material';
+import { Accordion, AccordionSummary, Button, Box, Typography, CircularProgress } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { endPoint, headers } from '../data/utils';
 
@@ -31,17 +31,24 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   const handleFieldClick = (field, selectedFarm) => {
     setSelectedField(field);
     onFieldSelect(field);
-    setExpanded(!expanded);
+    setExpanded(false);
   };
 
   const handleToggleExpand = () => {
     setExpanded(!expanded);
   };
 
+  const handleStepperReset = () => {
+    onFieldSelect(null);
+    setSelectedField(null);
+    setExpanded(true); // Show the party list
+  };
+
   //const filteredFields = fieldsData.filter((field) => field.partyId === selectedParty.id);
 
   return (
-    <Accordion expanded={expanded} onChange={handleToggleExpand}>
+    <>
+    {!selectedField && <Accordion expanded={expanded} onChange={handleToggleExpand}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6">
           List of Fields for {selectedFarm.name}
@@ -64,6 +71,16 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
       
       }
     </Accordion>
+    }
+    {selectedField && (
+        <>
+        <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
+          Field ({selectedField.name})
+          <Button onClick={handleStepperReset}>X</Button>
+        </Box>
+        </>
+      )}
+    </>
   );
 }
 
