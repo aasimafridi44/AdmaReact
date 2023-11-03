@@ -74,18 +74,19 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
     <LoadScript googleMapsApiKey={apiKey}>
       <GoogleMap
         key={clickedField.id}
-        mapContainerStyle={{ width: "100%", height: "400px" }}
-        zoom={22}
+        mapContainerStyle={{ width: "100%", height: "600px" }}
+        zoom={14}
         center={{ lat: -3.909050573693678, lng: -39.13905835799129 }}
         onClick={handleMapClick}
         onDblClick={handleDoubleClick}
       >
+      
       { 
-        //!drawingInProgress && console.log('pp', polygons.length, polygons, boundariesData.length === polygons.length) 
+        // !drawingInProgress && polygons.length > 0 && console.log('pp polygons', polygons.length, polygons) 
       }
       {!drawingInProgress && polygons.length > 0 && polygons.map((requestData, index) => (
         <>
-          {  //console.log('coming', index)
+          {  //console.log('coming', index, requestData)
           }
           <Polygon key={clickedField.id + index} path={requestData} />
         </>

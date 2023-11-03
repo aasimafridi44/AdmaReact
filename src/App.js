@@ -74,7 +74,7 @@ function App() {
 
   const handlePolygonComplete = (data) => {
     setPolygonData(data);
-    console.log('finish drwaing' , data)
+    // console.log('finish drwaing' , data)
   };
   
   const googleMapsApiKey = "AIzaSyADpUeiQiPTYYvsqwbVLiJWoSv0tf3fEVs";
@@ -83,7 +83,10 @@ function App() {
     try {
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
-      const filterData = resultArray(polygonData)      
+      // console.log('send cords -', polygonData)
+      const filterData = resultArray(polygonData)  
+      // console.log('filter send cords -', polygonData)   
+      // console.log('[ filterData ] -', [ filterData ])   
       const body =  {
         "parentId": selectedField.id,
         "parentType": "Field",
