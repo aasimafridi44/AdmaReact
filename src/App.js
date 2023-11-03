@@ -5,7 +5,9 @@ import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray} from './data/utils';
+import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray, googleMapKey} from './data/utils';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 
@@ -74,19 +76,15 @@ function App() {
 
   const handlePolygonComplete = (data) => {
     setPolygonData(data);
-    // console.log('finish drwaing' , data)
   };
   
-  const googleMapsApiKey = "AIzaSyADpUeiQiPTYYvsqwbVLiJWoSv0tf3fEVs";
+  const googleMapsApiKey = googleMapKey;
 
   const sendDataToAPI = async () => {
     try {
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
-      // console.log('send cords -', polygonData)
       const filterData = resultArray(polygonData)  
-      // console.log('filter send cords -', polygonData)   
-      // console.log('[ filterData ] -', [ filterData ])   
       const body =  {
         "parentId": selectedField.id,
         "parentType": "Field",
@@ -102,9 +100,19 @@ function App() {
       axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
       .then((response) => {
         setLoading(false);
+        // Show a success toast notification
+        toast.success('Data successfully created!', {
+          position: 'top-right',
+          autoClose: 3000, // Auto-close the toast after 3 seconds
+        });
       }).catch((error) => {
         setLoading(false);
         console.error('boundaries create failed:', error);
+        // Show an error toast notification
+        toast.error('Failed to create data!', {
+          position: 'top-right',
+          autoClose: 3000,
+        });
       })
 
     } catch (error) {
@@ -115,18 +123,19 @@ function App() {
 
   return (
     <>
+    <ToastContainer /> 
     <Container>
       <PartyList onPartySelect={handlePartySelect} />
       {selectedParty && <FarmList selectedParty={selectedParty} farms={farms} onFarmSelect={handleFarmSelect} />}
       {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} onFieldSelect={handleFieldSelect} />}
-      {selectedField && (
+    </Container>
+    {selectedField && (
                     <div>
                       <h4>Draw boundaries</h4>
                         <MapComponent onPolygonComplete={handlePolygonComplete} apiKey={googleMapsApiKey} boundariesData = {polygonData} clickedField={selectedField} />
                       <button onClick={sendDataToAPI}>Send Data to API</button>
                     </div>
       )}
-    </Container>
     </>
   );
 }

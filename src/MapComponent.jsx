@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { GoogleMap, Polygon, LoadScript } from "@react-google-maps/api";
+import { GoogleMap, Polygon, LoadScript, DrawingManager } from "@react-google-maps/api";
+import { libraries, polygonOptions } from './data/utils'
 
 
 const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField }) => {
@@ -71,7 +72,7 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
   };
 
   return (
-    <LoadScript googleMapsApiKey={apiKey}>
+    <LoadScript googleMapsApiKey={apiKey} libraries={libraries}>
       <GoogleMap
         key={clickedField.id}
         mapContainerStyle={{ width: "100%", height: "600px" }}
@@ -79,23 +80,45 @@ const MapComponent = ({ onPolygonComplete, apiKey, boundariesData, clickedField 
         center={{ lat: -3.909050573693678, lng: -39.13905835799129 }}
         onClick={handleMapClick}
         onDblClick={handleDoubleClick}
+        options={{
+                  mapTypeId: 'hybrid' // Set map type to 'satellite','roadmap', 'terrain', and 'hybrid'
+                }}
       >
       
       { 
         // !drawingInProgress && polygons.length > 0 && console.log('pp polygons', polygons.length, polygons) 
       }
       {!drawingInProgress && polygons.length > 0 && polygons.map((requestData, index) => (
-        <>
-          {  //console.log('coming', index, requestData)
-          }
-          <Polygon key={clickedField.id + index} path={requestData} />
-        </>
-
+          <Polygon key={clickedField.id + index} path={requestData} options={polygonOptions} />
       ))}
         
         {drawingInProgress && path.length > 0 && (
           <Polygon path={path} />
         )}
+
+        <DrawingManager
+          onPolygonComplete={(polygon) => {
+            if (drawingMode) {
+              // Change polygon colors here
+              polygon.setOptions({
+                fillColor: 'blue', // New fill color during draw time
+                strokeColor: 'red', // New stroke color during draw time
+              });
+              finishDrawing(); // Finish drawing after each polygon is drawn
+            }
+          }}
+          drawingMode={drawingMode ? 'polygon' : null}
+          options={{
+                    drawingControl: true,
+                    drawingControlOptions: {
+                      drawingModes: ['polygon'],
+                    },
+                    polygonOptions: {
+                      fillColor: 'blue', // Initial fill color when drawing
+                      strokeColor: 'red', // Initial stroke color when drawing
+                    },
+                  }}
+        />
       </GoogleMap>
 
       <button onClick={toggleDrawingMode}>
