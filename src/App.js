@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MapComponent from './MapComponent'
 import { Container,Stepper,Step,StepLabel,Box } from '@mui/material';
 import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray, googleMapKey} from './data/utils';
+import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray} from './data/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { LoadScript } from "@react-google-maps/api";
-
-
 
 
 function App() {
@@ -21,25 +18,8 @@ function App() {
   const [selectedField, setSelectedField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(null);
-  const [googleLoaded, setGoogleLoaded] = useState(false);
 
   const steps = ['Party', 'Farm', 'Field']; 
-
-  useEffect(() => {
-    if (window.google) {
-      // The Google Maps API is already loaded
-      setGoogleLoaded(true);
-    } else {
-      // Load the Google Maps API dynamically
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapKey}`;
-      script.async = true;
-      script.onload = () => {
-        setGoogleLoaded(true);
-      };
-      document.body.appendChild(script);
-    }
-  }, []);
   
   const handlePartySelect = (party) => {
     setSelectedParty(party);
@@ -54,11 +34,12 @@ function App() {
     setActiveStep(1);
   };
 
-  const handleFieldSelect = (field, selectedFarm) => {
+  const handleFieldSelect = (field) => {
     setSelectedField(field);
     setPolygonData([]);
-    setActiveStep(2);
-
+    setActiveStep(field == null ? 1 : 2);
+  
+    if(field) {
     axios.get(endPoint+ '/parties/'+ selectedParty.id +'/boundaries?api-version=2023-06-01-preview', { headers })
     .then((response) => {
        setLoading(false);
@@ -94,14 +75,13 @@ function App() {
       setLoading(false);
       console.error('Error fetching party data:', error);
     });
+  }
   };
 
   const handlePolygonComplete = (data) => {
     setPolygonData(data);
   };
   
-  const googleMapsApiKey = googleMapKey;
-
   const sendDataToAPI = async () => {
     try {
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
@@ -162,15 +142,8 @@ function App() {
     </Container>
     {selectedField && (
                     <Box marginTop={4} width={'100%'}>
-                    {!googleLoaded ? ( 
-                      <LoadScript googleMapsApiKey={googleMapsApiKey} >
-                        <MapComponent onPolygonComplete={handlePolygonComplete} boundariesData = {polygonData} clickedField={selectedField} />
-                      </LoadScript>
-                    ):
-                     (
+                    
                       <MapComponent onPolygonComplete={handlePolygonComplete} boundariesData = {polygonData} clickedField={selectedField} />
-      )
-                    }
                       <button onClick={sendDataToAPI}>Send Data to API</button>
                     </Box>
       )}

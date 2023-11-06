@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { GoogleMap, Polygon, DrawingManager } from "@react-google-maps/api";
+import { GoogleMap, Polygon } from "@react-google-maps/api";
 import { polygonOptions } from './data/utils'
 
 
