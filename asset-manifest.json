@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/AdmaReact/static/css/main.bc1dca3e.css",
-    "main.js": "/AdmaReact/static/js/main.80ed6bdd.js",
+    "main.js": "/AdmaReact/static/js/main.6dbfa772.js",
     "static/js/787.6058e193.chunk.js": "/AdmaReact/static/js/787.6058e193.chunk.js",
     "index.html": "/AdmaReact/index.html",
     "main.bc1dca3e.css.map": "/AdmaReact/static/css/main.bc1dca3e.css.map",
-    "main.80ed6bdd.js.map": "/AdmaReact/static/js/main.80ed6bdd.js.map",
+    "main.6dbfa772.js.map": "/AdmaReact/static/js/main.6dbfa772.js.map",
     "787.6058e193.chunk.js.map": "/AdmaReact/static/js/787.6058e193.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.bc1dca3e.css",
-    "static/js/main.80ed6bdd.js"
+    "static/js/main.6dbfa772.js"
   ]
 }
