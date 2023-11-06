@@ -99,7 +99,7 @@ function App() {
         "description": "Some description"
       }
       
-      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
+      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
       .then((response) => {
         setLoading(false);
         // Show a success toast notification
