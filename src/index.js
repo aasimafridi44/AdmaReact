@@ -8,10 +8,8 @@ import { LoadScript } from "@react-google-maps/api";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <LoadScript googleMapsApiKey={googleMapKey} >
+  <React.StrictMode>  
     <App />
-    </LoadScript>
   </React.StrictMode>
 );
 

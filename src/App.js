@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import MapComponent from './MapComponent'
 import { Container,Stepper,Step,StepLabel,Box } from '@mui/material';
 import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import { endPoint, headers, convertCoordinatesToLatLngArray,  resultArray} from './data/utils';
+import { endPoint, headers, resultArray} from './data/utils';
 import { ToastContainer, toast } from 'react-toastify';
+import MapLeaflet from './components/MapLeaflet'
 import 'react-toastify/dist/ReactToastify.css';
+
 
 
 function App() {
@@ -61,7 +62,7 @@ function App() {
             let coordinatesData = responses.map((response) => {
               return response?.data?.geometry?.coordinates
             });
-            coordinatesData = convertCoordinatesToLatLngArray(coordinatesData)
+            // coordinatesData = convertCoordinatesToLatLngArray(coordinatesData)
             setPolygonData(coordinatesData);
           })
           .catch((error) => {
@@ -82,6 +83,7 @@ function App() {
     setPolygonData(data);
   };
   
+  //This method was used for google map api.
   const sendDataToAPI = async () => {
     try {
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
@@ -139,13 +141,11 @@ function App() {
       <PartyList onPartySelect={handlePartySelect} activeStep={activeStep} />
       {selectedParty && <FarmList selectedParty={selectedParty} farms={farms} onFarmSelect={handleFarmSelect} />}
       {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} onFieldSelect={handleFieldSelect} />}
-    </Container>
-    {selectedField && (
-                    <Box marginTop={4} width={'100%'}>
-                    
-                      <MapComponent onPolygonComplete={handlePolygonComplete} boundariesData = {polygonData} clickedField={selectedField} />
-                      <button onClick={sendDataToAPI}>Send Data to API</button>
-                    </Box>
+      </Container>
+      {selectedField && (
+        <Box marginTop={4} width={'100%'}>
+          <MapLeaflet boundariesData={polygonData} selectedParty={selectedParty} selectedField={selectedField} />
+        </Box>
       )}
     </>
   );
