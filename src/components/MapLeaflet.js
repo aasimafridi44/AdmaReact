@@ -1,6 +1,7 @@
 // src/components/Map.js
 import React, {useEffect, useState} from 'react';
-import { MapContainer, TileLayer, Polygon, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Polygon, useMapEvents, ImageOverlay } from 'react-leaflet';
+import { LatLngBounds } from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import { CircularProgress, Button} from '@mui/material';
 import { endPoint, headers } from '../data/utils'
@@ -13,7 +14,7 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingCoords, setDrawingCoords] = useState([]);
   const [tempDrawingCoords, setTempDrawingCoords] = useState([]);
-
+  const imageURl = require("../images/field2.tif")
   // Initialize the state with boundariesData when it's available
   useEffect(() => {
     if (boundariesData) {
@@ -82,7 +83,28 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
       setTempDrawingCoords([...tempDrawingCoords, newCoords]);
     }
   };
-
+  const bounds = new LatLngBounds([
+    -3.8971294661278915,
+    -39.15107474199427
+],[
+    -3.893532905162577,
+    -39.134597420097236
+],[
+    -3.902438647059228,
+    -39.12841842438585
+],[
+    -3.9048363306758573,
+    -39.13356758747868
+],[
+    -3.9056926445936533,
+    -39.13923166688077
+],[
+    -3.908946629510984,
+    -39.147641966599075
+],[
+    -3.8971294661278915,
+    -39.15107474199427
+]) 
 
   return (
     <div>
@@ -109,7 +131,9 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
       />
-      {//console.log('polygons.length ', polygons.length, polygons )
+      {
+        //console.log('polygons.length ', polygons.length, polygons )
+        console.log("image", imageURl, imageURl.default)
       }
       {polygons.length > 0 && polygons.map((cords, index) => (
           <Polygon 
@@ -118,6 +142,15 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
             pathOptions={{ color: '#cc9900' }} // customize the styling
             />    
       ))}
+      {
+        
+        <ImageOverlay
+          url= {"https://admadatastore.blob.core.windows.net/boundaryimages/Aasim_Aasim1699447114899_2310090000_ndvi_10.tif"}
+          bounds={bounds}
+          opacity={0.5}
+          zIndex={5}
+        />
+      }
       
       {drawingCoords.length > 0 && (
             <Polygon
