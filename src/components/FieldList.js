@@ -4,7 +4,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Accordion, AccordionSummary, Button, Box, Typography, CircularProgress } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { endPoint, headers } from '../data/utils';
+import { endPoint, headers, apiVersion } from '../data/utils';
 
 function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   const [fieldsData, setfieldsData] = useState([]);
@@ -14,7 +14,7 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
 
 
   useEffect(() => {  
-    axios.get(`${endPoint}/parties/${selectedParty.id}/fields/?api-version=2022-11-01-preview`, { headers })
+    axios.get(`${endPoint}/parties/${selectedParty.id}/fields/?api-version=${apiVersion}`, { headers })
     .then((response) => {
       // console.log('rs', response)
       const result = response.data.value; 

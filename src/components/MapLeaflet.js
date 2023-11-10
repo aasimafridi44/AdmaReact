@@ -1,12 +1,13 @@
 // src/components/Map.js
 import React, {useEffect, useState} from 'react';
 import { MapContainer, TileLayer, Polygon, useMapEvents, ImageOverlay } from 'react-leaflet';
-import { LatLngBounds } from 'leaflet'
+import { LatLngBounds, LatLng } from 'leaflet'
 import 'leaflet/dist/leaflet.css';
 import { CircularProgress, Button} from '@mui/material';
-import { endPoint, headers } from '../data/utils'
+import { endPoint, headers, ImageOverlayURL, apiVersion } from '../data/utils'
 import axios from 'axios'
 import { ToastContainer, toast } from 'react-toastify';
+
 
 const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
   const [polygons, setPolygons] = useState([]);
@@ -14,14 +15,28 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingCoords, setDrawingCoords] = useState([]);
   const [tempDrawingCoords, setTempDrawingCoords] = useState([]);
-  const imageURl = require("../images/field2.tif")
+
   // Initialize the state with boundariesData when it's available
   useEffect(() => {
     if (boundariesData) {
       setPolygons(boundariesData);
       setLoading(false); // Hide the loader when data is available
-    }
-  }, [boundariesData]);
+    }    
+  }, [boundariesData, polygons]);
+
+  const getBoundsCords = (arr) => {
+    
+      const cords = arr[0];
+      // Calculate the opposite corners
+      const minLat = Math.min(...cords.map(coord => coord[0]));
+      const minLng = Math.min(...cords.map(coord => coord[1]));
+      const maxLat = Math.max(...cords.map(coord => coord[0]));
+      const maxLng = Math.max(...cords.map(coord => coord[1]));
+      return new LatLngBounds(
+        new LatLng(minLat, minLng),
+        new LatLng(maxLat, maxLng)
+      );
+  }
 
   const toggleDrawing = () => {
     if (!isDrawing) {
@@ -53,7 +68,7 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
         "name": `${selectedField.name} of boundary`,
         "description": "field boundary"
       }
-      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
+      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=${apiVersion}`, body,  {headers: runtimeHeaders})
       .then((response) => {
         setLoading(false);
         // Show a success toast notification
@@ -83,46 +98,15 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
       setTempDrawingCoords([...tempDrawingCoords, newCoords]);
     }
   };
-  const bounds = new LatLngBounds([
-    -3.8971294661278915,
-    -39.15107474199427
-],[
-    -3.893532905162577,
-    -39.134597420097236
-],[
-    -3.902438647059228,
-    -39.12841842438585
-],[
-    -3.9048363306758573,
-    -39.13356758747868
-],[
-    -3.9056926445936533,
-    -39.13923166688077
-],[
-    -3.908946629510984,
-    -39.147641966599075
-],[
-    -3.8971294661278915,
-    -39.15107474199427
-]) 
+  
 
   return (
-    <div>
+    <>
     <ToastContainer /> 
-    <div style={{ position: 'relative' }}>
-    {loading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
+    {loading ?  (
           <CircularProgress />
-        </div>
-      )}
-    <MapContainer
+    ) : (
+      <MapContainer
       center={[-3.909050573693678, -39.13905835799129]}
       zoom={14}
       style={{ width: '100%', height: '500px' }}
@@ -133,24 +117,30 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
       />
       {
         //console.log('polygons.length ', polygons.length, polygons )
-        console.log("image", imageURl, imageURl.default)
+        // console.log("image", imageURl, imageURl.default)
       }
       {polygons.length > 0 && polygons.map((cords, index) => (
+          
+          <>
           <Polygon 
             key={index} 
             positions={cords}
             pathOptions={{ color: '#cc9900' }} // customize the styling
-            />    
-      ))}
-      {
+            />
+            
+            {
+              <ImageOverlay
+                url= {ImageOverlayURL}
+                bounds={cords}
+                opacity={0.6}
+                zIndex={999}
+              />
         
-        <ImageOverlay
-          url= {"https://admadatastore.blob.core.windows.net/boundaryimages/Aasim_Aasim1699447114899_2310090000_ndvi_10.tif"}
-          bounds={bounds}
-          opacity={0.5}
-          zIndex={5}
-        />
-      }
+      }  
+          </> 
+             
+      ))}
+      
       
       {drawingCoords.length > 0 && (
             <Polygon
@@ -164,14 +154,15 @@ const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
             drawingCoords={drawingCoords}
       />
     </MapContainer>
-    </div>
+    )}
+
     <Button variant="contained" onClick={toggleDrawing}>
         {isDrawing ? 'Finish Drawing' : 'Start Drawing'}
     </Button>
       {isDrawing && (
         <p>Click on the map to start drawing the polygon.</p>
       )}
-     </div> 
+     </> 
   );
   
 };

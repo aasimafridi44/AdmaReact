@@ -4,7 +4,7 @@ import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import { endPoint, headers, resultArray} from './data/utils';
+import { endPoint, headers, resultArray, apiVersion} from './data/utils';
 import { ToastContainer, toast } from 'react-toastify';
 import MapLeaflet from './components/MapLeaflet'
 import 'react-toastify/dist/ReactToastify.css';
@@ -41,7 +41,7 @@ function App() {
     setActiveStep(field == null ? 1 : 2);
   
     if(field) {
-    axios.get(endPoint+ '/parties/'+ selectedParty.id +'/boundaries?api-version=2023-06-01-preview', { headers })
+    axios.get(`${endPoint}/parties/${selectedParty.id}/boundaries?api-version=${apiVersion}`, { headers })
     .then((response) => {
        setLoading(false);
        const result = response.data.value;       
@@ -51,7 +51,7 @@ function App() {
        if(boundariesData.length > 0) {
           // Create an array of Axios request promises
           const requestPromises = boundariesData.map((id) => {
-            return axios.get(`${endPoint}/parties/${selectedParty.id}/boundaries/${id}?api-version=2023-06-01-preview`, { headers });
+            return axios.get(`${endPoint}/parties/${selectedParty.id}/boundaries/${id}?api-version=${apiVersion}`, { headers });
           });
 
           // Use axios.all() to make multiple requests in parallel
@@ -101,7 +101,7 @@ function App() {
         "description": "Some description"
       }
       
-      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
+      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=${apiVersion}`, body,  {headers: runtimeHeaders})
       .then((response) => {
         setLoading(false);
         // Show a success toast notification

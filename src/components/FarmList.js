@@ -3,7 +3,7 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress, Button } from '@mui/material';
-import { endPoint, headers } from '../data/utils';
+import { endPoint, headers, apiVersion } from '../data/utils';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
@@ -16,7 +16,7 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
 
 
   useEffect(() => {   
-    axios.get(endPoint+ '/parties/'+ selectedParty.id +'/farms?api-version=2022-11-01-preview', { headers })
+    axios.get(`${endPoint}/parties/${selectedParty.id}/farms?api-version=${apiVersion}`, { headers })
     .then((response) => {
         setFarmsData(response.data.value);
         setLoading(false); // Set loading to false once data is fetched
