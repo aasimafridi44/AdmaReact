@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/AdmaReact/static/css/main.bc1dca3e.css",
-    "main.js": "/AdmaReact/static/js/main.72279a8a.js",
+    "main.css": "/AdmaReact/static/css/main.e52fa077.css",
+    "main.js": "/AdmaReact/static/js/main.4aa24a9b.js",
     "static/js/787.6058e193.chunk.js": "/AdmaReact/static/js/787.6058e193.chunk.js",
+    "static/media/spritesheet.svg": "/AdmaReact/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
     "index.html": "/AdmaReact/index.html",
-    "main.bc1dca3e.css.map": "/AdmaReact/static/css/main.bc1dca3e.css.map",
-    "main.72279a8a.js.map": "/AdmaReact/static/js/main.72279a8a.js.map",
+    "main.e52fa077.css.map": "/AdmaReact/static/css/main.e52fa077.css.map",
+    "main.4aa24a9b.js.map": "/AdmaReact/static/js/main.4aa24a9b.js.map",
     "787.6058e193.chunk.js.map": "/AdmaReact/static/js/787.6058e193.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.bc1dca3e.css",
-    "static/js/main.72279a8a.js"
+    "static/css/main.e52fa077.css",
+    "static/js/main.4aa24a9b.js"
   ]
 }
