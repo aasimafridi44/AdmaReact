@@ -1,157 +1,181 @@
-// src/components/Map.js
-import React, {useEffect, useState} from 'react';
-import { MapContainer, TileLayer, Polygon, useMapEvents } from 'react-leaflet';
+import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
-import { CircularProgress, Button} from '@mui/material';
-import { endPoint, headers } from '../data/utils'
-import axios from 'axios'
+import 'leaflet-draw/dist/leaflet.draw.css'
+import '../App.css';
+import axios from 'axios';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
+import { CircularProgress } from '@mui/material'
+import EditControlFC from './EditControlFC';
+import { convertToGeoJSON, headers, endPoint } from '../data/utils'
+import { fetchDataWithRetries } from './GetJobStatus'
+import { GetBoundaryDetails } from './GetBoundary'
 
-const MapLeaflet = ({boundariesData, selectedField, selectedParty}) => {
-  const [polygons, setPolygons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingCoords, setDrawingCoords] = useState([]);
-  const [tempDrawingCoords, setTempDrawingCoords] = useState([]);
 
-  // Initialize the state with boundariesData when it's available
+function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler}) {
+  const geoCollection = convertToGeoJSON(boundariesData)
+  const [geojson, setGeojson] = React.useState(geoCollection);
+  const [loading, setLoading] = React.useState(true);
+
   useEffect(() => {
-    if (boundariesData) {
-      setPolygons(boundariesData);
-      setLoading(false); // Hide the loader when data is available
-    }
+    const createGeoJSON = () => {
+      const geoCollectionData = convertToGeoJSON(boundariesData);
+      setGeojson(geoCollectionData);
+      setLoading(false);
+    };
+
+    createGeoJSON();
   }, [boundariesData]);
 
-  const toggleDrawing = () => {
-    if (!isDrawing) {
-      // Start drawing
-      setIsDrawing(true);
-      setDrawingCoords([]);
-    } else {
-      // Finish drawing
-      setIsDrawing(false);
-      drawingCoords.push(drawingCoords[0])
-      setPolygons([...polygons, drawingCoords]);
-      createBoundaries(drawingCoords, selectedField, selectedParty)
-      setDrawingCoords([]);
-    }
-  };
 
-  const createBoundaries = (coords, selectedField, selectedParty) => {
+  const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
+      setLoading(true);
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
-      const body =  {
-        "parentId": selectedField.id,
-        "parentType": "Field",
-        "type": "string",
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [ coords ]
-        },
-        "name": `${selectedField.name} of boundary`,
-        "description": "field boundary"
-      }
-      axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${selectedParty.name.replace(/\s/g, '')}${Date.now()}?api-version=2023-06-01-preview`, body,  {headers: runtimeHeaders})
-      .then((response) => {
-        setLoading(false);
-        // Show a success toast notification
-        toast.success('Data successfully created!', {
-          position: 'top-right',
-          autoClose: 3000, // Auto-close the toast after 3 seconds
+      const boundariesId = selectedParty.name.replace(/\s/g, '') + Date.now()
+      const featureCoords = coords.features;
+
+      if(featureCoords) {        
+        featureCoords.map((items) => {
+          const createBoundaryParam =  {
+            "parentId": selectedField.id,
+            "parentType": "Field",
+            "type": "string",
+            "geometry": {
+              "type": items.geometry.type,
+              "coordinates": items.geometry.coordinates
+            },
+            "name": `${selectedField.name} of boundary`,
+            "description": "field boundary"
+          }
+          //Validation - Do not allow more than one boundary.
+          if(featureCoords.length > 1) {
+            toast.error(`You can't create more than one boundary. Kindly refresh your browser or delete new one boundary.`, {
+              position: 'top-right',
+              autoClose: 3000, // Auto-close the toast after 3 seconds
+            });
+            return {}
+          }
+
+          //If action type: edit
+          if(actionType === 'draw:edited'){
+            //Get Boundary id
+            GetBoundaryDetails(selectedParty, selectedField).then((res)=> {
+              console.log('res', res.data.id)
+              const cascadeDelJobParams = {}
+              if(res.data.id !== '') {
+              const bid = res.data.id
+              axios.put(
+               `${endPoint}/boundaries/cascade-delete/${Date.now()}?partyId=${selectedParty.id}&boundaryId=${bid}&api-version=2023-06-01-preview`, 
+                cascadeDelJobParams, 
+                {headers: headers}
+                )
+                .then((response) => {
+                  fetchDataWithRetries(`${endPoint}/boundaries/cascade-delete/${response.data.id}?api-version=2023-06-01-preview`, 0, headers)
+                    .then((jobResponse) => {
+                      
+                      if(jobResponse.toLowerCase() === 'Succeeded'.toLowerCase()) {
+                        axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
+                        .then((response) => {
+                          // Show a success toast notification
+                          if(response.status === 200 || response.status === 201) {
+                            
+                            const setProperties = {
+                              'boundaryId': response.data.id,
+                              'partyId': selectedParty.id,
+                              'parentId': selectedField.id,
+                              'type': '',
+                              'mode': ''
+                            }
+                            let geoCords = coords;
+                            geoCords.features[0].properties = {...setProperties}
+                            //setGeojson(geoCords);
+                            toast.success(`Data successfully created! for ${response?.data?.id}`, {
+                            position: 'top-right',
+                            autoClose: 3000, // Auto-close the toast after 3 seconds
+                          });
+                          getBoundaryHandler(selectedField)
+                        }
+                        })
+                        .catch(error => {
+                          console.error('There was an error!', error);
+                        })
+                    }
+                    })
+                    
+                  })
+                  .catch(error => {
+                    console.error('There was an error!', error);
+                  });
+                }
+                });
+              } else {
+                console.log('boundary not exit')
+                axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
+                .then((response) => {
+                  
+                  setLoading(false);
+                  // Show a success toast notification
+                  if(response.status === 200 || response.status === 201) {
+                  
+                    const setProperties = {
+                      'boundaryId': response.data.id,
+                      'partyId': selectedParty.id,
+                      'parentId': selectedField.id,
+                      'type': '',
+                      'mode': ''
+                    }
+                    let geoCords = coords;
+                    geoCords.features[0].properties = {...setProperties}
+
+                    setGeojson(geoCords);
+                    
+                    toast.success(`Data successfully created! for ${response?.data?.id}`, {
+                    position: 'top-right',
+                    autoClose: 3000, // Auto-close the toast after 3 seconds
+                  });
+                    getBoundaryHandler(selectedField)
+                    setLoading(false);
+                  }
+                })
+                .catch(error => {
+                  console.error('There was an error!', error);
+                })
+              }
         });
-      }).catch((error) => {
-        setLoading(false);
-        console.error('boundaries create failed:', error);
-        // Show an error toast notification
-        toast.error('Failed to create data!', {
-          position: 'top-right',
-          autoClose: 3000,
-        });
-      })
-      
+      }      
     } catch(error) {
 
     }
   }
 
-  const handleMapClick = (e) => {
-    if (isDrawing) {
-      const newCoords = [e.latlng.lat, e.latlng.lng];
-      setDrawingCoords([...drawingCoords, [e.latlng.lat, e.latlng.lng]]);
-      setTempDrawingCoords([...tempDrawingCoords, newCoords]);
-    }
-  };
-
-
   return (
-    <div>
-    <ToastContainer /> 
-    <div style={{ position: 'relative' }}>
-    {loading && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-          }}
+    <>
+    {loading ? (
+        <CircularProgress /> // Display a loader while loading data
+        ) : (
+     geojson && (
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <ToastContainer />
+      <div style={{ width: '100%' }}>
+        <MapContainer
+          center={[-3.909050573693678, -39.13905835799129]}
+          zoom={14}
+          zoomControl={false}
         >
-          <CircularProgress />
-        </div>
-      )}
-    <MapContainer
-      center={[-3.909050573693678, -39.13905835799129]}
-      zoom={14}
-      style={{ width: '100%', height: '500px' }}
-    >
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={19}
-      />
-      {//console.log('polygons.length ', polygons.length, polygons )
-      }
-      {polygons.length > 0 && polygons.map((cords, index) => (
-          <Polygon 
-            key={index} 
-            positions={cords}
-            pathOptions={{ color: '#cc9900' }} // customize the styling
-            />    
-      ))}
-      
-      {drawingCoords.length > 0 && (
-            <Polygon
-              positions={drawingCoords}
-              pathOptions={{ color: 'green' }} // customize the styling
-            />
-      )}
-      <DrawingHandler
-            isActive={isDrawing}
-            onMapClick={handleMapClick}
-            drawingCoords={drawingCoords}
-      />
-    </MapContainer>
+          <TileLayer
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+          />
+          <EditControlFC geojson={geojson} setGeojson={setGeojson} onBoundarySave={createBoundaries} />
+        </MapContainer>
+      </div>
     </div>
-    <Button variant="contained" onClick={toggleDrawing}>
-        {isDrawing ? 'Finish Drawing' : 'Start Drawing'}
-    </Button>
-      {isDrawing && (
-        <p>Click on the map to start drawing the polygon.</p>
-      )}
-     </div> 
+    )
+        )}
+    </>
   );
-  
-};
-const DrawingHandler = ({ isActive, onMapClick, drawingCoords }) => {
-  useMapEvents({
-    click: (e) => {
-      if (isActive) {
-        onMapClick(e);
-      }
-    },
-  });
-
-  return null;
-};
+}
 
 export default MapLeaflet;
