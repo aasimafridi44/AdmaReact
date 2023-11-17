@@ -56,6 +56,7 @@ function PartyList({ onPartySelect, activeStep }) {
         {loading ? (
         <CircularProgress /> // Display a loader while loading data
         ) : (
+          parties &&
           parties.map((party) => (
               
             <Box 

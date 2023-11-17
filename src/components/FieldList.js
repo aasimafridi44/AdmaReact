@@ -16,7 +16,6 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   useEffect(() => {  
     axios.get(`${endPoint}/parties/${selectedParty.id}/fields/?api-version=2022-11-01-preview`, { headers })
     .then((response) => {
-      // console.log('rs', response)
       const result = response.data.value; 
       const selectedFieldId = result.filter((field) => field.farmId === selectedFarm.id)
       setfieldsData(selectedFieldId);

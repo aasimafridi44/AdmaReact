@@ -85,9 +85,7 @@ const MapComponent = ({ onPolygonComplete, boundariesData, clickedField }) => {
                 }}
       >
       
-      { 
-        // !drawingInProgress && polygons.length > 0 && console.log('pp polygons', polygons.length, polygons) 
-      }
+      
       {!drawingInProgress && polygons.length > 0 && polygons.map((requestData, index) => (
           <Polygon key={clickedField.id + index} path={requestData} options={polygonOptions} />
       ))}
