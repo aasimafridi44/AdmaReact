@@ -97,12 +97,13 @@ function App() {
         {<PartyList onPartySelect={handlePartySelect} activeStep={activeStep} />}
         {selectedParty && <FarmList selectedParty={selectedParty} farms={farms} onFarmSelect={handleFarmSelect} />}
         {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} onFieldSelect={handleFieldSelect} />}
+        
       </Container>
       {selectedField && polygonData && (
-        <>
-        <MapLeaflet boundariesData={polygonData} selectedParty={selectedParty} selectedField={selectedField} getBoundaryHandler={handleFieldSelect} />
-        </>
-      )}
+          <>
+          <MapLeaflet boundariesData={polygonData} selectedParty={selectedParty} selectedField={selectedField} getBoundaryHandler={handleFieldSelect} />
+          </>
+        )}
     </>
   );
 }

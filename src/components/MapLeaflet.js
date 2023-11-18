@@ -5,7 +5,7 @@ import '../App.css';
 import axios from 'axios';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
-import { CircularProgress } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
 import { convertToGeoJSON, headers, endPoint } from '../data/utils'
 import { fetchDataWithRetries } from './GetJobStatus'
@@ -26,7 +26,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
 
     createGeoJSON();
   }, [boundariesData]);
-
 
   const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
@@ -153,16 +152,21 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
   return (
     <>
     {loading ? (
-        <CircularProgress /> // Display a loader while loading data
+      <>
+        <div style={{ display: 'flex', height: '30vh',justifyContent: "center",alignItems: "center", }}>
+            <CircularProgress />  
+        </div>
+        <Typography display='block' align='center' ><br/>{`Please wait while the boundary is updated ...`}</Typography>
+      </>
         ) : (
      geojson && (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    <div style={{ display: 'flex', height: '100vh', marginTop: '20px' }}>
       <ToastContainer />
       <div style={{ width: '100%' }}>
         <MapContainer
           center={[-3.909050573693678, -39.13905835799129]}
-          zoom={14}
-          zoomControl={false}
+          zoom={13}
+          scrollWheelZoom={false}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
