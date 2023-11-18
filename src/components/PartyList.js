@@ -8,7 +8,7 @@ import { Accordion,
   Box,
   Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { endPoint, headers } from '../data/utils';
+import { headers, apiEndPoint } from '../data/utils';
 
 
 function PartyList({ onPartySelect, activeStep }) {
@@ -18,9 +18,9 @@ function PartyList({ onPartySelect, activeStep }) {
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
-    axios.get(endPoint+'/parties?api-version=2022-11-01-preview', { headers })
+    axios.get(`${apiEndPoint}/Party/GetAllParty`, {headers: headers})
     .then((response) => {
-      setParties(response.data.value);
+      setParties(response.data.Data);
       setLoading(false); // Set loading to false once data is fetched
     })
     .catch((error) => {
@@ -60,13 +60,13 @@ function PartyList({ onPartySelect, activeStep }) {
           parties.map((party) => (
               
             <Box 
-               key={party.id}
+               key={party.Id}
                onClick={() => handlePartyClick(party)}
                padding={1}
                border={0}
                borderRadius={4}
               >
-                <Typography style={{ cursor: 'pointer',  background: selectedParty === party ? 'lightblue' : 'white' }}>{party.name}</Typography>
+                <Typography style={{ cursor: 'pointer',  background: selectedParty === party ? 'lightblue' : 'white' }}>{party.Name}</Typography>
               </Box>
         ))
         )
