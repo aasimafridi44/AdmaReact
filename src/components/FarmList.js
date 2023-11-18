@@ -1,9 +1,7 @@
-// FarmList.js
-
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress, Button } from '@mui/material';
-import { endPoint, headers } from '../data/utils';
+import { apiEndPoint, headers } from '../data/utils';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
@@ -16,9 +14,9 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
 
 
   useEffect(() => {   
-    axios.get(endPoint+ '/parties/'+ selectedParty.id +'/farms?api-version=2022-11-01-preview', { headers })
+    axios.get(`${apiEndPoint}/Farm/GetFarmByPartyId/${selectedParty.Id}`, { headers })
     .then((response) => {
-        setFarmsData(response.data.value);
+        setFarmsData(response.data.Data);
         setLoading(false); // Set loading to false once data is fetched
     })
     .catch((error) => {
@@ -39,10 +37,8 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
     const handleStepperReset = () => {
       onFarmSelect(null);
       setSelectedFarm(null);
-      setExpanded(true); // Show the party list
+      setExpanded(true);
     };
-
-    const filteredFarms = farmsData.filter((farm) => farm.partyId === selectedParty.id);
 
     return (
       <>
@@ -50,14 +46,14 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
        <Accordion expanded={expanded} onChange={handleToggleExpand}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6">
-            List of Farms for {selectedParty.name}
+            List of Farms for {selectedParty.Name}
         </Typography>
         </AccordionSummary>
         <AccordionDetails>
           {loading ? (
           <CircularProgress /> // Display a loader while loading data
         ) : 
-              filteredFarms.map((farm) => (
+        farmsData.map((farm) => (
               <Box 
                 key={farm.id}
                 onClick={() => handleFarmClick(farm)}

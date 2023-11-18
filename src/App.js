@@ -3,8 +3,8 @@ import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import axios from 'axios';
-import { endPoint, headers, resultArray} from './data/utils';
-import { ToastContainer, toast } from 'react-toastify';
+import { endPoint, headers} from './data/utils';
+import { ToastContainer } from 'react-toastify';
 import MapLeaflet from './components/MapLeaflet';
 import { Container,Stepper,Step,StepLabel,Box } from '@mui/material';
 import 'react-toastify/dist/ReactToastify.css';
@@ -17,7 +17,6 @@ function App() {
   const [selectedField, setSelectedField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(null);
-  const [isNewBoundary, setIsNewBoundary] = useState(false)
 
   const steps = ['Party', 'Farm', 'Field'];
 

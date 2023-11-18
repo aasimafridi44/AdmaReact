@@ -44,7 +44,7 @@ function PartyList({ onPartySelect, activeStep }) {
     setSelectedParty(null);
     setExpanded(true); // Show the party list
   };
-  // const steps = ['Party', 'Farm', 'Field']; 
+
   return (
     <>
     { activeStep === null &&
@@ -77,7 +77,7 @@ function PartyList({ onPartySelect, activeStep }) {
       {selectedParty && (
         <>
         <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
-          Party({selectedParty.name})
+          Party({selectedParty.Name})
           <Button onClick={handleStepperReset}>X</Button>
         </Box>
         </>
