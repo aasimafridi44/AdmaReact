@@ -1,5 +1,3 @@
-// FieldList.js
-
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Accordion, AccordionSummary, Button, Box, Typography, CircularProgress } from '@mui/material';
