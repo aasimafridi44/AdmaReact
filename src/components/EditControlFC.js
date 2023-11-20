@@ -6,7 +6,7 @@ import { getBoundsCords } from '../data/utils'
 //import axios from 'axios';
 
 
-export default function EditControlFC({ geojson, setGeojson, onBoundarySave }) {
+export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage }) {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
   //const [settelieImage, SetSettelieImage] = React.useState('')
@@ -32,10 +32,11 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave }) {
     console.log('handle change', geojson?.features[0]?.properties?.boundaryId)
     SetIsEdit(false)
    // axios.get()
-  }, [geojson]);
+  }, [geojson, satelliteImage]);
 
   const handleChange = (e) => {
     const geo = ref.current?.toGeoJSON();   
+    console.log('GeoJson', geo)
     onBoundarySave(geo, e.type, e.layerType)
     if (geo?.type === 'FeatureCollection') {
       setGeojson(geo);
@@ -78,12 +79,16 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave }) {
         }}
       />
     </FeatureGroup>
-    {!isEdit && <ImageOverlay
-        url="https://tavant-my.sharepoint.com/personal/aasim_khan_tavant_com/Documents/aasim-field-8.png"
+    {!isEdit && satelliteImage && 
+      <>
+      {console.log('satelliteImage', satelliteImage)}
+      <ImageOverlay
+        url={satelliteImage}
         bounds={getBoundsCords(geojson?.features[0]?.geometry?.coordinates)}
         opacity={0.7}
         zIndex={999}
-    />  
+    />
+    </>  
     }
     </>
     )}    

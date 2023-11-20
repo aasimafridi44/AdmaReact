@@ -5,14 +5,14 @@ import '../App.css';
 import axios from 'axios';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
-import { Box, CircularProgress, Typography } from '@mui/material'
+import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
 import { convertToGeoJSON, headers, endPoint } from '../data/utils'
 import { fetchDataWithRetries } from './GetJobStatus'
 import { GetBoundaryDetails } from './GetBoundary'
 
 
-function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler}) {
+function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage}) {
   const geoCollection = convertToGeoJSON(boundariesData)
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
@@ -172,7 +172,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
           />
-          <EditControlFC geojson={geojson} setGeojson={setGeojson} onBoundarySave={createBoundaries} />
+          <EditControlFC geojson={geojson} setGeojson={setGeojson} onBoundarySave={createBoundaries} satelliteImage={satelliteImage} />
         </MapContainer>
       </div>
     </div>
