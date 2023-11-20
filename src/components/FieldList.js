@@ -1,10 +1,8 @@
-// FieldList.js
-
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import { Accordion, AccordionSummary, Button, Box, Typography, CircularProgress } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { endPoint, headers } from '../data/utils';
+import { apiEndPoint, headers } from '../data/utils';
 
 function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
   const [fieldsData, setfieldsData] = useState([]);
@@ -14,11 +12,11 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
 
 
   useEffect(() => {  
-    axios.get(`${endPoint}/parties/${selectedParty.id}/fields/?api-version=2022-11-01-preview`, { headers })
+    axios.get(`${apiEndPoint}/Field/GetFieldByPartyAndFarmId/${selectedParty.Id}/${selectedFarm.id}`, { headers })
     .then((response) => {
-      const result = response.data.value; 
-      const selectedFieldId = result.filter((field) => field.farmId === selectedFarm.id)
-      setfieldsData(selectedFieldId);
+      const fieldData = response.data.Data; 
+      //const selectedFieldId = result.filter((field) => field.FarmId === selectedFarm.id)
+      setfieldsData(fieldData);
       setLoading(false);
     })
     .catch((error) => {
@@ -58,13 +56,13 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
       ) : 
         fieldsData.map((field) => (
           <Box 
-                key={field.id}
+                key={field.Id}
                 padding={1}
                 border={0}
                 onClick={() => handleFieldClick(field, selectedFarm)}
                 style={{background: selectedField === field ? 'lightblue' : 'white' ,  cursor: 'pointer' }}
             >
-            <Typography style={{ cursor: 'pointer',  background: selectedField === field  ? 'lightblue' : 'white' }}>{field.name}</Typography>
+            <Typography style={{ cursor: 'pointer',  background: selectedField === field  ? 'lightblue' : 'white' }}>{field.Name}</Typography>
           </Box>
         ))
       
@@ -74,7 +72,7 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
     {selectedField && (
         <>
         <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
-          Field ({selectedField.name})
+          Field ({selectedField.Name})
           <Button onClick={handleStepperReset}>X</Button>
         </Box>
         </>

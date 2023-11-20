@@ -1,3 +1,5 @@
+import { LatLngBounds, LatLng } from 'leaflet'
+
 export const requestedUrl = (requestUrl) => {
   const proxyServer = ['http://localhost:8080/', 'https://cors-anywhere.herokuapp.com/']
   let proxyUrl
@@ -8,18 +10,13 @@ export const requestedUrl = (requestUrl) => {
   }
   return proxyUrl
 }
-
+export const apiEndPoint = requestedUrl(window.location.href)  + 'https://adma-api.azurewebsites.net'
 export const endPoint = requestedUrl(window.location.href) + 'https://adma.farmbeats.azure.net';
-export const googleMapKey = "AIzaSyADpUeiQiPTYYvsqwbVLiJWoSv0tf3fEVs"
-export const libraries = ['drawing'];
-export const apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjlHbW55RlBraGMzaE91UjIybXZTdmduTG83WSIsImtpZCI6IjlHbW55RlBraGMzaE91UjIybXZTdmduTG83WSJ9.eyJhdWQiOiJodHRwczovL2Zhcm1iZWF0cy5henVyZS5uZXQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9jNmMxZTlkYS01ZDBjLTRmOGYtOWEwMi0zYzY3MjA2ZWZiZDYvIiwiaWF0IjoxNzAwMjI2MzA1LCJuYmYiOjE3MDAyMjYzMDUsImV4cCI6MTcwMDIzMDIwNSwiYWlvIjoiRTJWZ1lBaFlkNlV1OUxyKzNscmVkdkVqQ1NzdkFRQT0iLCJhcHBpZCI6IjNiZDYzZDQwLTIyYzMtNDQ2ZS1iOGI3LTgwOGMxNTdkMTFkOCIsImFwcGlkYWNyIjoiMSIsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0L2M2YzFlOWRhLTVkMGMtNGY4Zi05YTAyLTNjNjcyMDZlZmJkNi8iLCJvaWQiOiJjMTg1Y2ZjMy0xNTE5LTQzOWQtOTBlNS0zMzM3MmUzNjIxMjEiLCJyaCI6IjAuQVVrQTJ1bkJ4Z3hkajAtYUFqeG5JRzc3MXNXVHVMRWNyb3RCbUpNTGVNQkNKYlJKQUFBLiIsInN1YiI6ImMxODVjZmMzLTE1MTktNDM5ZC05MGU1LTMzMzcyZTM2MjEyMSIsInRpZCI6ImM2YzFlOWRhLTVkMGMtNGY4Zi05YTAyLTNjNjcyMDZlZmJkNiIsInV0aSI6IkJscmREUU1RUmtHeTk1Y0hCVDFzQUEiLCJ2ZXIiOiIxLjAifQ.CkdX-RayS0w5rsj934ixflN1ahOlOiwoZfSkJLihHkuKKGCm-ZDAyKy261os-byACuQ6QhkOTe9cnQvXpRMAjSSJRVqvcf2GEI0ETsnq0KvLUyjX_WjwutIrV9BYhi0sSjFiOrnJORfJkWREl8Gcei8ExnZGKC3oGp2k7kSoi8zxPn_zUBfyB0oJknigEsXT7uKWDXM4fAFpgytJj342l4CXEPBClT6a_dEQm5q7AHYfUAPK4nN5ZbNXfgOyICz6JVkNrp886sARuuleQgN5lmzsUPFBjye3TJed8Gyh6L913qmiyg89_oFzXcDmlFnOZT2jhlmNSYYY3Ey6XbP6IA";
+export const apiToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IjlHbW55RlBraGMzaE91UjIybXZTdmduTG83WSIsImtpZCI6IjlHbW55RlBraGMzaE91UjIybXZTdmduTG83WSJ9.eyJhdWQiOiJodHRwczovL2Zhcm1iZWF0cy5henVyZS5uZXQiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9jNmMxZTlkYS01ZDBjLTRmOGYtOWEwMi0zYzY3MjA2ZWZiZDYvIiwiaWF0IjoxNzAwMzcyMjMzLCJuYmYiOjE3MDAzNzIyMzMsImV4cCI6MTcwMDM3NjEzMywiYWlvIjoiRTJWZ1lDajUvS3M4M0NTTkplUlp4cHByejEwM0FBQT0iLCJhcHBpZCI6IjNiZDYzZDQwLTIyYzMtNDQ2ZS1iOGI3LTgwOGMxNTdkMTFkOCIsImFwcGlkYWNyIjoiMSIsImlkcCI6Imh0dHBzOi8vc3RzLndpbmRvd3MubmV0L2M2YzFlOWRhLTVkMGMtNGY4Zi05YTAyLTNjNjcyMDZlZmJkNi8iLCJvaWQiOiJjMTg1Y2ZjMy0xNTE5LTQzOWQtOTBlNS0zMzM3MmUzNjIxMjEiLCJyaCI6IjAuQVVrQTJ1bkJ4Z3hkajAtYUFqeG5JRzc3MXNXVHVMRWNyb3RCbUpNTGVNQkNKYlJKQUFBLiIsInN1YiI6ImMxODVjZmMzLTE1MTktNDM5ZC05MGU1LTMzMzcyZTM2MjEyMSIsInRpZCI6ImM2YzFlOWRhLTVkMGMtNGY4Zi05YTAyLTNjNjcyMDZlZmJkNiIsInV0aSI6Ik92dW9SWnYwWlVtdEJ0V1BvQ2h6QUEiLCJ2ZXIiOiIxLjAifQ.cTQIoBEb81ouIp4jUjOiff3QT4Xzn0hV3ypTnLevV7OfUyDnVFuI3e23ln3Ez6A2EQ0dOYfsk3XOp_UWntbNy4l77CQwPCUX2DhdDKu0bmwV9s_UlbJC_gHHxSHCLQ650_lqWEu1VyRvOyDSmfgSVo0l63PA9oHTimWaEmOyG6RL6E0mk-Kb7aBINFJLtLA-6p-7UhM-HqNFzeEM5AqRroCZrMHZyLr66BrN-huEBxHM1F9eKHDtxb3-O61vu3uB0SSNdTVl1XzeUmscJWE2YU5i98R8hOJJhQZwl4ADyUpQtHXi4QFiayYcthYBTP9OvcnBL-DhrOlC5waSsD5q4g";
+
 // Define your custom headers
 export const headers = {
-  'Authorization':'Bearer '+ apiToken,
-  'Content-Type': 'application/json',
-  'api-version': '2023-16-01-preview',
-  'Accept': 'application/json',
-  'Access-Control-Allow-Origin': '*'
+  'Content-Type': 'application/json'
 };
 export const polygonOptions = {
   fillColor: '#1aff8c', // Fill color (in this case, orange)
@@ -61,6 +58,12 @@ export const resultArray = (inputArray) => {
 export const to_long_lat = (coordinates) => {
   return coordinates.map(polygon =>
     polygon.map(point => [point[1], point[0]])
+  );
+};
+
+export const to_lat_lng = (coordinates) => {
+  return coordinates.map(polygon =>
+    polygon.map(point => [point[0], point[1]])
   );
 };
 
@@ -109,4 +112,23 @@ export const extractArraysFromFeatureCollection = (featureCollection) => {
   });
 
   return arrays;
+}
+export const getBoundsCords = (arr) => {
+  if(arr !== undefined)  {
+  //const newLatLng = to_lat_lng(arr)
+  //console.log('arr', arr)
+  //console.log('newLatLng', newLatLng)
+  const cords = arr[0];
+  // Calculate the opposite corners
+  const minLat = Math.min(...cords.map(coord => coord[0]));
+  const minLng = Math.min(...cords.map(coord => coord[1]));
+  const maxLat = Math.max(...cords.map(coord => coord[0]));
+  const maxLng = Math.max(...cords.map(coord => coord[1]));
+  //console.log('=]]', new LatLng(minLat, minLng), new LatLng(maxLat, maxLng))
+  return new LatLngBounds(
+    new LatLng(minLng, minLat ),
+    new LatLng(maxLng, maxLat )
+  );
+  }
+  return []
 }
