@@ -71,9 +71,7 @@ function App() {
             if(coordinatesData.length > 0) {
               let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{
                 sImage = res;
-                console.log('bid=', sImage, 'res', res)
                 if(sImage !== ''){
-                  console.log('comggg=', sImage)
                   SetSatelliteImage(sImage)
                 }
             })

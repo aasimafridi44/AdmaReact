@@ -29,7 +29,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
 
   const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
-      
       setLoading(true);
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
@@ -54,6 +53,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
               position: 'top-right',
               autoClose: 3000, // Auto-close the toast after 3 seconds
             });
+            setLoading(false);
             return {}
           }
 
@@ -110,7 +110,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                 }
                 });
               } else {
-                console.log('boundary not exit')
                 axios.patch(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
                 .then((response) => {
                   
