@@ -29,9 +29,8 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
         }
       });
     }
-    console.log('handle change', geojson?.features[0]?.properties?.boundaryId)
+    
     SetIsEdit(false)
-   // axios.get()
   }, [geojson, satelliteImage]);
 
   const handleChange = (e) => {
@@ -50,15 +49,16 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
   const handleModifyStop = () => {
     SetIsEdit(false)
   }
-  const bounds = new L.LatLngBounds([40.712216, -74.22655], [40.773941, -74.12544])
+ // const bounds = new L.LatLngBounds([40.712216, -74.22655], [40.773941, -74.12544])
   //[[geojson?.features[0]?.geometry?.coordinates]]
   // [ [ -3.93012, -39.198528 ], [ -3.880602, -39.093907 ] ]
   //""https://tavant-my.sharepoint.com/personal/aasim_khan_tavant_com/Documents/aasim-field-8.png"
   //console.log('cords bound', getBoundsCords(geojson?.features[0]?.geometry?.coordinates))
-
+  const boundCords = getBoundsCords(geojson?.features[0]?.geometry?.coordinates)
+  //console.log('length of boundCords ', boundCords)
   return (
     <>
-    {geojson.features.length>0 && (
+    {
     <>
     
     <FeatureGroup ref={ref}>
@@ -79,7 +79,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
         }}
       />
     </FeatureGroup>
-    {!isEdit && satelliteImage && 
+    {!isEdit && satelliteImage && boundCords.length>0 && 
       <>
       {console.log('satelliteImage', satelliteImage)}
       <ImageOverlay
@@ -91,7 +91,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
     </>  
     }
     </>
-    )}    
+    }    
     </>
   );
 }
