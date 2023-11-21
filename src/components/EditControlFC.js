@@ -58,7 +58,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
 
   return (
     <>
-    {geojson.features.length>0 && (
+    {
     <>
     
     <FeatureGroup ref={ref}>
@@ -91,7 +91,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
     </>  
     }
     </>
-    )}    
+    }    
     </>
   );
 }

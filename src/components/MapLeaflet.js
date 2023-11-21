@@ -29,23 +29,23 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
 
   const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
+      
       setLoading(true);
       const runtimeHeaders = { ...headers }; // Create a copy of your default headers
       runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
-      const boundariesId = selectedParty.name.replace(/\s/g, '') + Date.now()
+      const boundariesId = selectedParty.Name.replace(/\s/g, '') + Date.now()
       const featureCoords = coords.features;
-
-      if(featureCoords) {        
+      if(featureCoords) {
         featureCoords.map((items) => {
           const createBoundaryParam =  {
-            "parentId": selectedField.id,
+            "parentId": selectedField.Id,
             "parentType": "Field",
             "type": "string",
             "geometry": {
               "type": items.geometry.type,
               "coordinates": items.geometry.coordinates
             },
-            "name": `${selectedField.name} of boundary`,
+            "name": `${selectedField.Name} of boundary`,
             "description": "field boundary"
           }
           //Validation - Do not allow more than one boundary.
@@ -66,7 +66,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
               if(res.data.id !== '') {
               const bid = res.data.id
               axios.put(
-               `${endPoint}/boundaries/cascade-delete/${Date.now()}?partyId=${selectedParty.id}&boundaryId=${bid}&api-version=2023-06-01-preview`, 
+               `${endPoint}/boundaries/cascade-delete/${Date.now()}?partyId=${selectedParty.Id}&boundaryId=${bid}&api-version=2023-06-01-preview`, 
                 cascadeDelJobParams, 
                 {headers: headers}
                 )
@@ -75,14 +75,14 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                     .then((jobResponse) => {
                       
                       if(jobResponse.toLowerCase() === 'Succeeded'.toLowerCase()) {
-                        axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
+                        axios.patch(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
                         .then((response) => {
                           // Show a success toast notification
                           if(response.status === 200 || response.status === 201) {
                             
                             const setProperties = {
                               'boundaryId': response.data.id,
-                              'partyId': selectedParty.id,
+                              'partyId': selectedParty.Id,
                               'parentId': selectedField.id,
                               'type': '',
                               'mode': ''
@@ -111,7 +111,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                 });
               } else {
                 console.log('boundary not exit')
-                axios.patch(`${endPoint}/parties/${selectedParty.id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
+                axios.patch(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
                 .then((response) => {
                   
                   setLoading(false);
@@ -120,7 +120,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                   
                     const setProperties = {
                       'boundaryId': response.data.id,
-                      'partyId': selectedParty.id,
+                      'partyId': selectedParty.Id,
                       'parentId': selectedField.id,
                       'type': '',
                       'mode': ''
