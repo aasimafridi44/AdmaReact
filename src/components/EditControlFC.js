@@ -6,7 +6,7 @@ import { getBoundsCords } from '../data/utils'
 //import axios from 'axios';
 
 
-export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage }) {
+export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
   //const [settelieImage, SetSettelieImage] = React.useState('')
@@ -49,13 +49,35 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
   const handleModifyStop = () => {
     SetIsEdit(false)
   }
+
+  const handleBoundaryDelete = (e) => {
+    console.log('e', e)
+    //SetIsEdit(false)
+    // Using Object.entries
+    let cordsValue = ''
+    let boundaryId, partyId
+    for (const [key, value] of Object.entries(e.layers._layers)) {
+      boundaryId = value.feature.properties.boundaryId;
+      partyId = value.feature.properties.partyId;
+      // Do something with cordsValue
+      console.log(`Key: ${key}, Cords Value:`,  boundaryId);
+    }
+    onBoundaryDelete(e.type, partyId, boundaryId)
+    return cordsValue
+  }
+  const handleBoundaryDeleteCancel = (e) => {
+    SetIsEdit(false)
+  }
+  const handleBoundaryDeleteStart = (e) => {
+    SetIsEdit(true)
+  }
  // const bounds = new L.LatLngBounds([40.712216, -74.22655], [40.773941, -74.12544])
   //[[geojson?.features[0]?.geometry?.coordinates]]
   // [ [ -3.93012, -39.198528 ], [ -3.880602, -39.093907 ] ]
   //""https://tavant-my.sharepoint.com/personal/aasim_khan_tavant_com/Documents/aasim-field-8.png"
-  console.log('cords bound', getBoundsCords(geojson?.features[0]?.geometry?.coordinates))
-  const boundCords = getBoundsCords(geojson?.features[0]?.geometry?.coordinates)
-  //console.log('length of boundCords ', boundCords)
+  console.log('cords bound--',geojson, geojson?.features.length)
+  const boundCords = geojson?.features.length > 0 ? getBoundsCords(geojson?.features[0]?.geometry?.coordinates) : []
+  console.log('length of boundCords ', boundCords)
   return (
     <>
     {
@@ -66,9 +88,11 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
         position="topright"
         onEdited={handleChange}
         onCreated={handleChange}
-        onDeleted={handleChange}
+        onDeleted={handleBoundaryDelete}
         onEditStart={handleModifyStart}
         onEditStop={handleModifyStop}
+        onDeleteStop={handleBoundaryDeleteCancel}
+        onDeleteStart={handleBoundaryDeleteStart}
         draw={{
           rectangle: false,
           circle: true,
@@ -79,9 +103,9 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
         }}
       />
     </FeatureGroup>
-    {!isEdit && satelliteImage && (boundCords.length !==0 ) && 
+    {!isEdit && satelliteImage && (boundCords.length !== 0 ) && 
       <>
-      {console.log('satelliteImage', satelliteImage)}
+      {console.log('satelliteImage IFC', satelliteImage)}
       <ImageOverlay
         url={satelliteImage}
         bounds={getBoundsCords(geojson?.features[0]?.geometry?.coordinates)}

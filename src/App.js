@@ -35,6 +35,20 @@ function App() {
     setActiveStep(1);
   };
 
+  const handleLoadImage = (selectedParty, bid) => {
+
+    let sImage = GetSatelliteImageByBid(selectedParty, bid).then((res) =>{
+      console.log('res sat image', res)
+      sImage = res;
+      if(sImage !== ''){
+        SetSatelliteImage(sImage)
+      } else {
+        SetSatelliteImage('')
+      }
+    })
+
+  }
+
   const handleFieldSelect = (field) => {
     setSelectedField(field);
     setPolygonData([]);
@@ -54,8 +68,9 @@ function App() {
           'type': response?.data?.Data?.Geometry?.Type
         }
       });
+      console.log('Bound info', coordinatesData, coordinatesData.length)
       setPolygonData(coordinatesData);
-      if(coordinatesData.length > 0) {
+      if(coordinatesData.length > 0 && coordinatesData[0]?.boundaryId !== '') {
         let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{
           sImage = res;
           if(sImage !== ''){
@@ -99,7 +114,8 @@ function App() {
               selectedParty={selectedParty} 
               selectedField={selectedField} 
               getBoundaryHandler={handleFieldSelect} 
-              satelliteImage={satelliteImage}  
+              satelliteImage={satelliteImage}
+              handleLoadImage={handleLoadImage}
               />
             </>
           )}
