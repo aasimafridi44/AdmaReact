@@ -9,7 +9,8 @@ import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
 import { convertToGeoJSON, headers, endPoint } from '../data/utils'
 import { fetchDataWithRetries } from './GetJobStatus'
-import { GetBoundaryDetails } from './GetBoundary'
+import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
+import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
 
 
 function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage}) {
@@ -30,23 +31,14 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
   const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
       setLoading(true);
-      const runtimeHeaders = { ...headers }; // Create a copy of your default headers
-      runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
+      //const runtimeHeaders = { ...headers }; // Create a copy of your default headers
+      //runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
+      //Generate boundary id - PartyName + DateTime
       const boundariesId = selectedParty.Name.replace(/\s/g, '') + Date.now()
       const featureCoords = coords.features;
       if(featureCoords) {
         featureCoords.map((items) => {
-          const createBoundaryParam =  {
-            "parentId": selectedField.Id,
-            "parentType": "Field",
-            "type": "string",
-            "geometry": {
-              "type": items.geometry.type,
-              "coordinates": items.geometry.coordinates
-            },
-            "name": `${selectedField.Name} of boundary`,
-            "description": "field boundary"
-          }
+          
           //Validation - Do not allow more than one boundary.
           if(featureCoords.length > 1) {
             toast.error(`You can't create more than one boundary. Kindly refresh your browser or delete new one boundary.`, {
@@ -60,57 +52,59 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
           //If action type: edit
           if(actionType === 'draw:edited'){
             //Get Boundary id
-            GetBoundaryDetails(selectedParty, selectedField).then((res)=> {
-              console.log('res', res.data.id)
+            GetBoundaryDetails(selectedParty, selectedField).then((boundaryDetails)=> {
               const cascadeDelJobParams = {}
-              if(res.data.id !== '') {
-              const bid = res.data.id
-              axios.put(
-               `${endPoint}/boundaries/cascade-delete/${Date.now()}?partyId=${selectedParty.Id}&boundaryId=${bid}&api-version=2023-06-01-preview`, 
-                cascadeDelJobParams, 
-                {headers: headers}
-                )
-                .then((response) => {
-                  fetchDataWithRetries(`${endPoint}/boundaries/cascade-delete/${response.data.id}?api-version=2023-06-01-preview`, 0, headers)
-                    .then((jobResponse) => {
-                      
-                      if(jobResponse.toLowerCase() === 'Succeeded'.toLowerCase()) {
-                        axios.patch(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
-                        .then((response) => {
-                          // Show a success toast notification
-                          if(response.status === 200 || response.status === 201) {
+              if(boundaryDetails.length > 0) {
+                boundaryDetails.map((res) => {
+                  
+                  if(res.data.Data.Id !== '') {
+                    const bid = res.data.Data.Id
+                    DeleteSatelliteImageByJob(selectedParty, bid)
+                    .then((response) => {
+                        //fetchDataWithRetries(`${endPoint}/boundaries/cascade-delete/${response.Id}?api-version=2023-06-01-preview`, 0, headers)
+                        //  .then((jobResponse) => {
                             
-                            const setProperties = {
-                              'boundaryId': response.data.id,
-                              'partyId': selectedParty.Id,
-                              'parentId': selectedField.id,
-                              'type': '',
-                              'mode': ''
-                            }
-                            let geoCords = coords;
-                            geoCords.features[0].properties = {...setProperties}
-                            //setGeojson(geoCords);
-                            toast.success(`Data successfully created! for ${response?.data?.id}`, {
-                            position: 'top-right',
-                            autoClose: 3000, // Auto-close the toast after 3 seconds
-                          });
-                          getBoundaryHandler(selectedField)
-                        }
+                          //  if(jobResponse.toLowerCase() === 'Succeeded'.toLowerCase()) {
+                              CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
+                              .then((response) => {
+                                // Show a success toast notification
+                                if(response.status === 200 || response.status === 201) {
+                                  
+                                  const setProperties = {
+                                    'boundaryId': response.data.id,
+                                    'partyId': selectedParty.Id,
+                                    'parentId': selectedField.id,
+                                    'type': '',
+                                    'mode': ''
+                                  }
+                                  let geoCords = coords;
+                                  setGeojson(geoCords);
+                                  geoCords.features[0].properties = {...setProperties}
+                                  //setGeojson(geoCords);
+                                  toast.success(`Data successfully created! for ${response?.data?.id}`, {
+                                  position: 'top-right',
+                                  autoClose: 3000, // Auto-close the toast after 3 seconds
+                                });
+                                getBoundaryHandler(selectedField)
+                              }
+                              })
+                              .catch(error => {
+                                console.error('There was an error!', error);
+                              })
+                          //}
+                         // })
+                          
                         })
                         .catch(error => {
                           console.error('There was an error!', error);
-                        })
-                    }
-                    })
-                    
-                  })
-                  .catch(error => {
-                    console.error('There was an error!', error);
-                  });
-                }
-                });
+                        });
+                      }
+                })
+              }
+              
+            });
               } else {
-                axios.patch(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesId}?api-version=2023-06-01-preview`, createBoundaryParam, { headers: runtimeHeaders })
+                CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
                 .then((response) => {
                   
                   setLoading(false);

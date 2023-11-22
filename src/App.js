@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import PartyList from './components/PartyList';
 import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
-import axios from 'axios';
-import { endPoint, headers} from './data/utils';
 import { ToastContainer } from 'react-toastify';
 import MapLeaflet from './components/MapLeaflet';
 import { Box,Container, Grid, Stepper,Step,StepLabel } from '@mui/material';
 import { GetSatelliteImageByBid } from './components/GetBoundaryImage'
+import { GetBoundaryDetails } from './components/GetBoundary'
 import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
   const [polygonData, setPolygonData] = useState([]);
@@ -41,54 +41,33 @@ function App() {
     setActiveStep(field == null ? 1 : 2);
   
     if(field) {
-    axios.get(endPoint+ '/parties/'+ selectedParty.Id +'/boundaries?api-version=2023-06-01-preview', { headers })
+    GetBoundaryDetails(selectedParty,field)
     .then((response) => {
-       setLoading(false);
-       const result = response.data.value;
-       const boundariesData = result.filter((boundary) => boundary.parentId === field.Id).map((boundary) => boundary.id);
-       if(boundariesData.length > 0) {
-          // Create an array of Axios request promises
-          const requestPromises = boundariesData.map((id) => {
-            return axios.get(`${endPoint}/parties/${selectedParty.Id}/boundaries/${id}?api-version=2023-06-01-preview`, { headers });
-          });
-
-          // Use axios.all() to make multiple requests in parallel
-          axios.all(requestPromises)
-          .then((responses) => {
-            setLoading(false);
-            // Handle the responses here
-            let coordinatesData = responses.map((response) => {
-              return {
-                'boundaryId': response?.data?.id,
-                'geometry': response?.data?.geometry?.coordinates,
-                'partyId': response?.data?.partyId,
-                'parentId': response?.data?.parentId,
-                'type': response?.data?.geometry?.type
-              }
-            });
-            
-           
-            if(coordinatesData.length > 0) {
-              let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{
-                sImage = res;
-                if(sImage !== ''){
-                  SetSatelliteImage(sImage)
-                }
-            })
-              
-            }
-            setPolygonData(coordinatesData);
-          })
-          .catch((error) => {
-            setLoading(false);
-            // Handle any errors that occurred during the requests
-            console.error('One or more requests failed:', error);
-          });
-       }        
+      setLoading(false);
+      // Handle the responses here
+      let coordinatesData = response.map((response) => {
+        return {
+          'boundaryId': response?.data?.Data?.Id,
+          'geometry': response?.data?.Data?.Geometry?.Coordinates,
+          'partyId': response?.data?.Data?.PartyId,
+          'parentId': response?.data?.Data?.ParentId,
+          'type': response?.data?.Data?.Geometry?.Type
+        }
+      });
+      setPolygonData(coordinatesData);
+      if(coordinatesData.length > 0) {
+        let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{
+          sImage = res;
+          if(sImage !== ''){
+            SetSatelliteImage(sImage)
+          }
+        })
+      }
+                   
     })
     .catch((error) => {
       setLoading(false);
-      console.error('Error fetching party data:', error);
+      console.error('Error fetching boundary cords data:', error);
     });
   }
   };
@@ -97,7 +76,7 @@ function App() {
     <>
       <ToastContainer />
       <Grid container spacing={2}>
-        <Grid item xs={4}>
+        <Grid item xs={12}>
         <Box margin={3}>
           <Stepper activeStep={activeStep}>
               {steps.map((label, index) => (
@@ -112,7 +91,7 @@ function App() {
         {selectedFarm && <FieldList selectedParty={selectedParty} selectedFarm={selectedFarm} onFieldSelect={handleFieldSelect} />}
         
         </Grid>
-        <Grid item xs={8}>
+        <Grid item xs={12} style={{border:'2px'}}>
           {selectedField && polygonData && (
             <>
             <MapLeaflet 
@@ -122,11 +101,6 @@ function App() {
               getBoundaryHandler={handleFieldSelect} 
               satelliteImage={satelliteImage}  
               />
-            </>
-          )}
-          {!selectedField &&  (
-            <>
-            <MapLeaflet boundariesData={[]} selectedParty={{}} selectedField={{}} getBoundaryHandler={{}} />
             </>
           )}
         </Grid>

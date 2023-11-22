@@ -1,12 +1,11 @@
 import axios from 'axios';
-import { endPoint, headers } from '../data/utils'
+import { apiEndPoint } from '../data/utils'
 
 //Get All Boundary By Party Id.
 export const GetAllBoundaryByField = async (selectedParty, selectedField) => {
     try {
-        const response = await axios.get(endPoint+ '/parties/'+ selectedParty.Id +'/boundaries?api-version=2023-06-01-preview', { headers })
-        const result = response.data.value;
-        const boundaries = result.filter((boundary) => boundary.parentId === selectedField.Id).map((boundary) => boundary.id);
+        const response = await axios.get(`${apiEndPoint}/Boundary/GetByPartyAndFieldId/${selectedParty.Id}/${selectedField.Id}`)
+        const boundaries = response.data.Data;
         return boundaries;
     }
     catch(error) {
@@ -18,9 +17,13 @@ export const GetAllBoundaryByField = async (selectedParty, selectedField) => {
 export const GetBoundaryDetails = async (selectedParty, selectedField) => {
     try {
         const boundariesData = await GetAllBoundaryByField(selectedParty, selectedField)
-        const response = axios.get(`${endPoint}/parties/${selectedParty.Id}/boundaries/${boundariesData[0]}?api-version=2023-06-01-preview`, { headers })
-        // Resolve the promise with the transformed data
-        return response;
+        const requestPromises = boundariesData.map((item) => {
+           return axios.get(`${apiEndPoint}/Boundary/GetByPartyAndBoundaryId/${selectedParty.Id}/${item.Id}`)
+        });
+        return axios.all(requestPromises)
+        .then((responses) => {
+            return responses
+        }) 
     }
     catch(error) {
         console.error('Error fetching boundary data:', error);
@@ -28,8 +31,19 @@ export const GetBoundaryDetails = async (selectedParty, selectedField) => {
     
 }
 
-/*
-    boundariesData.map((id) => {
-         return 
-   
-    }); */
+//Get Boundary Details By Boundary Id.
+export const CreateBoundary = async (selectedParty, boundaryId, selectedField, geoType, coordinates) => {
+    const createBoundaryParam =  {
+        "parentId": selectedField.Id,
+        "parentType": "Field",
+        "type": "string",
+        "geometry": {
+          "type": geoType,
+          "coordinates": coordinates
+        },
+        "name": `${selectedField.Name} of boundary`,
+        "description": "field boundary"
+    }
+    const response = await axios.patch(`${apiEndPoint}/Boundary/CreateOrUpdate/${selectedParty.Id}/${boundaryId}`, createBoundaryParam)
+    return response;
+}
