@@ -2,25 +2,26 @@ import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css'
 import '../App.css';
-import axios from 'axios';
 import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
 import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
-import { convertToGeoJSON, headers, endPoint } from '../data/utils'
-import { fetchDataWithRetries } from './GetJobStatus'
+import { convertToGeoJSON } from '../data/utils'
 import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
 import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
 
 
-function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage}) {
+function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
+  //console.log('boundariesData pre', boundariesData)
   const geoCollection = convertToGeoJSON(boundariesData)
+  //console.log('boundariesData after', geoCollection)
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
 
   useEffect(() => {
     const createGeoJSON = () => {
       const geoCollectionData = convertToGeoJSON(boundariesData);
+      //console.log('use effect', geoCollection)
       setGeojson(geoCollectionData);
       setLoading(false);
     };
@@ -28,11 +29,21 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     createGeoJSON();
   }, [boundariesData]);
 
+  const handleBoundaryDelete = (actionType, selectedParty, boundaryId) => {
+    if(actionType === 'draw:deleted'){
+      setLoading(true);
+      DeleteSatelliteImageByJob(selectedParty, boundaryId)
+      .then((res => {
+        
+      }))
+      setGeojson(convertToGeoJSON([]))
+      setLoading(false);
+    }
+  }
+
   const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
     try {
       setLoading(true);
-      //const runtimeHeaders = { ...headers }; // Create a copy of your default headers
-      //runtimeHeaders['Content-Type'] = 'application/merge-patch+json';
       //Generate boundary id - PartyName + DateTime
       const boundariesId = selectedParty.Name.replace(/\s/g, '') + Date.now()
       const featureCoords = coords.features;
@@ -59,46 +70,55 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                   
                   if(res.data.Data.Id !== '') {
                     const bid = res.data.Data.Id
-                    DeleteSatelliteImageByJob(selectedParty, bid)
+                    DeleteSatelliteImageByJob(selectedParty.Id, bid)
                     .then((response) => {
                         //fetchDataWithRetries(`${endPoint}/boundaries/cascade-delete/${response.Id}?api-version=2023-06-01-preview`, 0, headers)
                         //  .then((jobResponse) => {
                             
                           //  if(jobResponse.toLowerCase() === 'Succeeded'.toLowerCase()) {
-                              CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
-                              .then((response) => {
-                                // Show a success toast notification
-                                if(response.status === 200 || response.status === 201) {
-                                  
-                                  const setProperties = {
-                                    'boundaryId': response.data.id,
-                                    'partyId': selectedParty.Id,
-                                    'parentId': selectedField.id,
-                                    'type': '',
-                                    'mode': ''
-                                  }
-                                  let geoCords = coords;
-                                  setGeojson(geoCords);
-                                  geoCords.features[0].properties = {...setProperties}
-                                  //setGeojson(geoCords);
-                                  toast.success(`Data successfully created! for ${response?.data?.id}`, {
-                                  position: 'top-right',
-                                  autoClose: 3000, // Auto-close the toast after 3 seconds
-                                });
-                                getBoundaryHandler(selectedField)
-                              }
-                              })
-                              .catch(error => {
-                                console.error('There was an error!', error);
-                              })
+                              
                           //}
                          // })
                           
                         })
                         .catch(error => {
                           console.error('There was an error!', error);
+                    });
+                    CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
+                      .then((response) => {
+                        console.log('create api res out', response)
+                        // Show a success toast notification
+                        if(response.status === 200) {
+                          console.log('create api res', response)
+                          const setProperties = {
+                            'boundaryId': response.data.Data.Id,
+                            'partyId': selectedParty.Id,
+                            'parentId': selectedField.Id,
+                            'type': response.data.Data.Geometry.Type,
+                            'mode': ''
+                          }
+                          let geoCords = []
+                          geoCords.push(response.data.Data);
+                          console.log('response of create', geoCords)
+                          geoCords = convertToGeoJSON(geoCords, 'create')
+                          console.log('converted of res-', geoCords)
+                          geoCords.features[0].properties = {...setProperties}
+                          console.log('properties of res-', geoCords)
+
+                          setGeojson(geoCords);
+                          
+                          toast.success(`Data successfully updated! for ${response.data.Data.Id}`, {
+                          position: 'top-right',
+                          autoClose: 3000, // Auto-close the toast after 3 seconds
                         });
+                        setLoading(false);
+                        handleLoadImage(selectedParty, response.data.Data.Id);
                       }
+                      })
+                      .catch(error => {
+                        console.error('There was an error!', error);
+                      })
+                  }
                 })
               }
               
@@ -106,32 +126,39 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
               } else {
                 CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
                 .then((response) => {
-                  
-                  setLoading(false);
+                  console.log('create api res out', response)
+                  setLoading(true);
                   // Show a success toast notification
-                  if(response.status === 200 || response.status === 201) {
+                  if(response.status === 200) {
                   
                     const setProperties = {
-                      'boundaryId': response.data.id,
+                      'boundaryId': response.data.Data.Id,
                       'partyId': selectedParty.Id,
-                      'parentId': selectedField.id,
-                      'type': '',
+                      'parentId': selectedField.Id,
+                      'type': response.data.Data.Geometry.Type,
                       'mode': ''
                     }
-                    let geoCords = coords;
+                    let geoCords = []
+                    geoCords.push(response.data.Data);
+                    console.log('response of create', geoCords)
+                    geoCords = convertToGeoJSON(geoCords, 'create')
+                    console.log('converted of res-', geoCords)
                     geoCords.features[0].properties = {...setProperties}
+                    console.log('properties of res-', geoCords)
 
                     setGeojson(geoCords);
                     
-                    toast.success(`Data successfully created! for ${response?.data?.id}`, {
+                    toast.success(`Data successfully created! for ${response.data.Data.Id}`, {
                     position: 'top-right',
                     autoClose: 3000, // Auto-close the toast after 3 seconds
                   });
-                    getBoundaryHandler(selectedField)
-                    setLoading(false);
+                  setLoading(false);
+                  handleLoadImage(selectedParty, response.data.Data.Id);
+                    
                   }
                 })
                 .catch(error => {
+                  setLoading(false);
                   console.error('There was an error!', error);
                 })
               }
@@ -165,7 +192,14 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
           />
-          <EditControlFC geojson={geojson} setGeojson={setGeojson} onBoundarySave={createBoundaries} satelliteImage={satelliteImage} />
+          <EditControlFC 
+            geojson={geojson} 
+            setGeojson={setGeojson} 
+            onBoundarySave={createBoundaries}
+            satelliteImage={satelliteImage}
+            onBoundaryDelete={handleBoundaryDelete} 
+            handleLoadImage={handleLoadImage}  
+            />
         </MapContainer>
       </div>
     </div>

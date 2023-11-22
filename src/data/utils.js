@@ -71,16 +71,22 @@ export const to_lat_lng = (coordinates) => {
   );
 };
 
-export const convertToGeoJSON = (coordinates) => {
+export const convertToGeoJSON = (coordinates, type = 'get') => {
   //const to_long_lat = coordinates.map(items => to_long_lat(items));
   
   const geojson = {
     type: 'FeatureCollection',
     features: [],
   };
-  for (const coords of coordinates) {
-    const arr = coords.geometry
-    //console.log('convertToGeoJSON', arr)
+  console.log('length', coordinates, coordinates.length)
+  if(coordinates.length < 1){
+    return geojson
+  }
+  console.log('for loop', coordinates)
+  for (const coords of coordinates) { 
+    console.log('for loop--', coords)  
+    const arr = type === 'get' ? coords.geometry : coords.Geometry.Coordinates
+    console.log('convertToGeoJSON', arr)
     const feature = {
       type: 'Feature',
       properties: {
@@ -98,6 +104,7 @@ export const convertToGeoJSON = (coordinates) => {
 
     geojson.features.push(feature);
   }
+  console.log('geojson', geojson)
   return geojson;
 };
 
