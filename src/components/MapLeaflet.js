@@ -6,24 +6,28 @@ import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
 import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
-import { convertToGeoJSON } from '../data/utils'
+import { convertToGeoJSON, compareTwoArray } from '../data/utils'
 import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
 import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
 
 
 function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
-  //console.log('boundariesData pre', boundariesData)
+  console.log('boundariesData pre', boundariesData)
   const geoCollection = convertToGeoJSON(boundariesData)
-  //console.log('boundariesData after', geoCollection)
+  console.log('boundariesData after', geoCollection)
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
+  const [previousCords, setPreviousCords] = React.useState(geoCollection)
 
   useEffect(() => {
     const createGeoJSON = () => {
       const geoCollectionData = convertToGeoJSON(boundariesData);
-      //console.log('use effect', geoCollection)
+      
       setGeojson(geoCollectionData);
+      setPreviousCords(geoCollectionData);
       setLoading(false);
+      console.log('use effect coming', geojson)
+      console.log('use effect coming previousCords', previousCords)
     };
 
     createGeoJSON();
@@ -41,13 +45,20 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     }
   }
 
-  const createBoundaries = (coords, actionType, isNewBoundary = undefined) => {
+  const createBoundaries = React.useCallback((coords, actionType, isNewBoundary = undefined) => {
     try {
-      setLoading(true);
+      console.log(' coming', geojson)
+      console.log(' coming previousCords', previousCords)
+      console.log('two array', coords.features, previousCords)
+      //setLoading(true);
+      
+      //compareTwoArray()
       //Generate boundary id - PartyName + DateTime
       const boundariesId = selectedParty.Name.replace(/\s/g, '') + Date.now()
       const featureCoords = coords.features;
+      
       if(featureCoords) {
+        
         featureCoords.map((items) => {
           
           //Validation - Do not allow more than one boundary.
@@ -62,6 +73,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
 
           //If action type: edit
           if(actionType === 'draw:edited'){
+           
+            return {}
             //Get Boundary id
             GetBoundaryDetails(selectedParty, selectedField).then((boundaryDetails)=> {
               const cascadeDelJobParams = {}
@@ -167,7 +180,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     } catch(error) {
 
     }
-  }
+  },[geojson])
 
   return (
     <>
@@ -183,6 +196,10 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     <div style={{ display: 'flex', height: '100vh', marginTop: '20px' }}>
       <ToastContainer />
       <div style={{ width: '100%' }}>
+        {
+          console.log(' coming render', geojson, previousCords)
+          
+        }
         <MapContainer
           center={[-3.909050573693678, -39.13905835799129]}
           zoom={13}

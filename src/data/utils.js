@@ -143,3 +143,32 @@ export const getBoundsCords = (arr) => {
   }
   return []
 }
+
+export const compareTwoArray = (sourceArr, targetArr) => {
+    // Check if the arrays have the same length
+    if (sourceArr.length !== targetArr.length) {
+      return false;
+    }
+  
+    // Iterate through each element of the arrays
+    for (let i = 0; i < sourceArr.length; i++) {
+      const subArray1 = sourceArr[i];
+      const subArray2 = targetArr[i];
+  
+      // Check if the subarrays have the same length
+      if (subArray1.length !== subArray2.length) {
+        return false;
+      }
+  
+      // Iterate through each element of the subarrays
+      for (let j = 0; j < subArray1.length; j++) {
+        // Compare the elements
+        if (subArray1[j] !== subArray2[j]) {
+          return false;
+        }
+      }
+    }
+  
+    // If no differences are found, the arrays are equal
+    return true;
+  }

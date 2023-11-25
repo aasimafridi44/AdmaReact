@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as L from 'leaflet';
 import { FeatureGroup, ImageOverlay } from 'react-leaflet';
 import  EditControl  from './EditControl';
@@ -9,7 +9,7 @@ import { getBoundsCords } from '../data/utils'
 export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
-  //const [settelieImage, SetSettelieImage] = React.useState('')
+  const [cords, setCords] = useState(null)
 
   React.useEffect(() => {
     if (ref.current?.getLayers().length === 0 && geojson) {
@@ -28,6 +28,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
           }
         }
       });
+      setCords(geojson)
     }
     
     SetIsEdit(false)
@@ -35,7 +36,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
 
   const handleChange = (e) => {
     const geo = ref.current?.toGeoJSON();   
-    console.log('GeoJson', geo)
+    console.log('Edit - GeoJson',e, geo, cords)
     onBoundarySave(geo, e.type, e.layerType)
     if (geo?.type === 'FeatureCollection') {
       setGeojson(geo);
