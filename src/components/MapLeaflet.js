@@ -86,10 +86,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                     });
                     CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
                       .then((response) => {
-                        console.log('create api res out', response)
                         // Show a success toast notification
                         if(response.status === 200) {
-                          console.log('create api res', response)
                           const setProperties = {
                             'boundaryId': response.data.Data.Id,
                             'partyId': selectedParty.Id,
@@ -98,13 +96,9 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                             'mode': ''
                           }
                           let geoCords = []
-                          geoCords.push(response.data.Data);
-                          console.log('response of create', geoCords)
-                          geoCords = convertToGeoJSON(geoCords, 'create')
-                          console.log('converted of res-', geoCords)
+                          geoCords.push(response.data.Data);                          
+                          geoCords = convertToGeoJSON(geoCords, 'create')                          
                           geoCords.features[0].properties = {...setProperties}
-                          console.log('properties of res-', geoCords)
-
                           setGeojson(geoCords);
                           
                           toast.success(`Data successfully updated! for ${response.data.Data.Id}`, {
@@ -126,7 +120,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
               } else {
                 CreateBoundary(selectedParty, boundariesId, selectedField, items.geometry.type, items.geometry.coordinates)
                 .then((response) => {
-                  console.log('create api res out', response)
                   setLoading(true);
                   // Show a success toast notification
                   if(response.status === 200) {
@@ -140,12 +133,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
                     }
                     let geoCords = []
                     geoCords.push(response.data.Data);
-                    console.log('response of create', geoCords)
                     geoCords = convertToGeoJSON(geoCords, 'create')
-                    console.log('converted of res-', geoCords)
                     geoCords.features[0].properties = {...setProperties}
-                    console.log('properties of res-', geoCords)
-
                     setGeojson(geoCords);
                     
                     toast.success(`Data successfully created! for ${response.data.Data.Id}`, {

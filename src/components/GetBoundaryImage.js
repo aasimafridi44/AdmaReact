@@ -4,15 +4,10 @@ import { apiEndPoint } from '../data/utils'
 //Get Boundary Image By Party Id and Boundary Id.
 export const GetSatelliteImageByBid = async (selectedParty, selectedBid) => {
     try {
-        console.log('GetSatelliteImageByBid')
         const response = await axios.get(`${apiEndPoint}/Boundary/GetBoundaryImage/${selectedParty.Id}/${selectedBid}`)
-        console.log('GetSatelliteImageByBid', response)
         const satelliteImage = response.data.Data
         console.log('satelliteImage', satelliteImage)
-        let blobUrl = '';
-        blobUrl = await fetchImageWithRetry(satelliteImage)
-        console.log('checking', blobUrl)
-        return blobUrl
+        return satelliteImage
     }
     catch(error) {
         console.error('Error fetching boundary image data:', error);
