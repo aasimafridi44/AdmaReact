@@ -38,7 +38,6 @@ function App() {
   const handleLoadImage = (selectedParty, bid) => {
 
     let sImage = GetSatelliteImageByBid(selectedParty, bid).then((res) =>{
-      console.log('res sat image', res)
       sImage = res;
       if(sImage !== ''){
         SetSatelliteImage(sImage)
@@ -68,7 +67,6 @@ function App() {
           'type': response?.data?.Data?.Geometry?.Type
         }
       });
-      console.log('Bound info', coordinatesData, coordinatesData.length)
       setPolygonData(coordinatesData);
       if(coordinatesData.length > 0 && coordinatesData[0]?.boundaryId !== '') {
         let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{

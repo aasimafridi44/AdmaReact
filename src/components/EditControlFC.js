@@ -1,15 +1,30 @@
 import React from 'react';
 import * as L from 'leaflet';
-import { FeatureGroup, ImageOverlay } from 'react-leaflet';
+import { FeatureGroup } from 'react-leaflet';
 import  EditControl  from './EditControl';
 import { getBoundsCords } from '../data/utils'
-//import axios from 'axios';
+import GeoTiffLayer from './GeotiffLayer'
 
 
 export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
-  //const [settelieImage, SetSettelieImage] = React.useState('')
+  
+  const options = {
+    pixelValuesToColorFn: (values) => {
+      // transforming single value into an rgba color
+      const nir = values[0];
+
+      if (nir === 0) return;
+      // console.log("nir:", nir);
+      const r = (nir / 20000) * 255;
+      const g = 0;
+      const b = 0;
+      return `rgba(${r},${g},${b}, 1)`;
+    },
+    resolution: 64,
+    opacity: 1
+  };
 
   React.useEffect(() => {
     if (ref.current?.getLayers().length === 0 && geojson) {
@@ -34,8 +49,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
   }, [geojson, satelliteImage]);
 
   const handleChange = (e) => {
-    const geo = ref.current?.toGeoJSON();   
-    console.log('GeoJson', geo)
+    const geo = ref.current?.toGeoJSON();
     onBoundarySave(geo, e.type, e.layerType)
     if (geo?.type === 'FeatureCollection') {
       setGeojson(geo);
@@ -51,16 +65,11 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
   }
 
   const handleBoundaryDelete = (e) => {
-    console.log('e', e)
-    //SetIsEdit(false)
-    // Using Object.entries
     let cordsValue = ''
     let boundaryId, partyId
     for (const [key, value] of Object.entries(e.layers._layers)) {
       boundaryId = value.feature.properties.boundaryId;
       partyId = value.feature.properties.partyId;
-      // Do something with cordsValue
-      console.log(`Key: ${key}, Cords Value:`,  boundaryId);
     }
     onBoundaryDelete(e.type, partyId, boundaryId)
     return cordsValue
@@ -76,8 +85,7 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
   // [ [ -3.93012, -39.198528 ], [ -3.880602, -39.093907 ] ]
   //""https://tavant-my.sharepoint.com/personal/aasim_khan_tavant_com/Documents/aasim-field-8.png"
   console.log('cords bound--',geojson, geojson?.features.length)
-  const boundCords = geojson?.features.length > 0 ? getBoundsCords(geojson?.features[0]?.geometry?.coordinates) : []
-  console.log('length of boundCords ', boundCords)
+  
   return (
     <>
     {
@@ -103,15 +111,10 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
         }}
       />
     </FeatureGroup>
-    {!isEdit && satelliteImage && (boundCords.length !== 0 ) && 
+    {!isEdit && satelliteImage && 
       <>
       {console.log('satelliteImage IFC', satelliteImage)}
-      <ImageOverlay
-        url={satelliteImage}
-        bounds={getBoundsCords(geojson?.features[0]?.geometry?.coordinates)}
-        opacity={0.7}
-        zIndex={999}
-    />
+      <GeoTiffLayer url={satelliteImage} options={options} />
     </>  
     }
     </>
