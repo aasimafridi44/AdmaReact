@@ -2,11 +2,10 @@ import React from 'react';
 import * as L from 'leaflet';
 import { FeatureGroup } from 'react-leaflet';
 import  EditControl  from './EditControl';
-import { getBoundsCords } from '../data/utils'
 import GeoTiffLayer from './GeotiffLayer'
 
 
-export default function EditControlFC({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) {
+const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) => {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
   
@@ -121,4 +120,6 @@ export default function EditControlFC({ geojson, setGeojson, onBoundarySave, sat
     }    
     </>
   );
-}
+});
+
+export default EditControlFC

@@ -8,35 +8,49 @@ const GeotiffLayer = ({ url, options }) => {
   const geoTiffLayerRef = useRef();
   const context = useLeafletContext();
   const map = useMap();
-  console.log('GeotiffLayer')
+
   useEffect(() => {
-    console.log('url', url)
-    const container = context.layerContainer || context.map;    
+    const container = context.layerContainer || context.map;
+
+    // Fetch the GeoTIFF only when the URL changes
     fetch(url)
       .then((response) => response.arrayBuffer())
       .then((arrayBuffer) => {
+        // Parse the GeoTIFF
+        parseGeoraster(arrayBuffer)
+          .then((georaster) => {
+            // Remove the previous GeoRasterLayer instance
+            if (geoTiffLayerRef.current) {
+              container.removeLayer(geoTiffLayerRef.current);
+            }
 
-        parseGeoraster(arrayBuffer).then((georaster) => {        
-          options.georaster = georaster;
-          geoTiffLayerRef.current = new GeoRasterLayer({
-            georaster: georaster,
-            opacity: 0.7,
-            resolution: 256
-        });
+            // Create a new GeoRasterLayer
+            geoTiffLayerRef.current = new GeoRasterLayer({
+              georaster: georaster,
+              opacity: 0.7,
+              resolution: 256
+            });
 
-          container.addLayer(geoTiffLayerRef.current);
-          map.fitBounds(geoTiffLayerRef.current.getBounds());
+            // Add the new GeoRasterLayer to the map
+            container.addLayer(geoTiffLayerRef.current);
 
-        }).catch((error) => {
-          console.error('Error parsing georaster:', error);
-        });
-      })
+            // Fit the map bounds to the GeoRasterLayer
+            map.fitBounds(geoTiffLayerRef.current.getBounds());
+          })
+          .catch((error) => {
+            console.error('Error parsing georaster:', error);
+          });
+      });
 
-      return () => {
+    // Cleanup: Remove the GeoRasterLayer when the component is unmounted
+    return () => {
+      if (geoTiffLayerRef.current) {
         container.removeLayer(geoTiffLayerRef.current);
-      };
-  }, [context.layerContainer, context.map, map, options, url])
+      }
+    };
+  }, [context.layerContainer, context.map, map, url]);
 
   return null;
-}
+};
+
 export default GeotiffLayer;
