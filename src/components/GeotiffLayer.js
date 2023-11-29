@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLeafletContext } from "@react-leaflet/core";
+import * as L from 'leaflet';
 import { useMap } from "react-leaflet";
 import parseGeoraster from 'georaster'
 import GeoRasterLayer from "georaster-layer-for-leaflet";
@@ -8,57 +9,17 @@ import { calculateColorForRaster, calculateValuesForLegend } from '../service/Ra
 
 window.proj4 = proj4;
 
-const GeotiffLayer = ({ url, options }) => {
+const GeotiffLayer = ({ url }) => {
   const geoTiffLayerRef = useRef();
   const context = useLeafletContext();
   const map = useMap();
-
-  const pixelValuesToColorFn = (values) => {
-    // Check if values array has at least two elements (NIR and RED)
-    if (!Array.isArray(values) || values.length < 2) {
-      console.log('Invalid values array:', values);
-      return 'rgba(0, 0, 0, 0)'; // Transparent for invalid data
-    }
-  
-    const [nir, red] = values;
-  
-    // Check if NIR is zero or very close to zero
-    if (Math.abs(nir) < 1e-6) {
-      console.log('Transparent for zero or close to zero NIR');
-      return 'rgba(0, 0, 0, 0)'; // Transparent for zero NIR
-    }
-  
-    // Check if RED is undefined or very close to zero
-    if (typeof red === 'undefined' || Math.abs(red) < 1e-6) {
-      console.log('Transparent for undefined or close to zero RED');
-      return 'rgba(0, 0, 0, 0)'; // Transparent for undefined or zero RED
-    }
-  
-    const ndvi = (nir - red) / (nir + red);
-  
-    // Check if NDVI is NaN (division by zero)
-    if (isNaN(ndvi)) {
-      console.log('NDVI is NaN. NIR:', nir, 'RED:', red);
-      return 'rgba(0, 0, 0, 0)'; // Transparent for NaN values
-    }
-  
-    console.log('NDVI:', ndvi);
-  
-    // Map NDVI to RGB color scale
-    const r = Math.min(255, Math.max(0, Math.round((ndvi + 1) * 127.5)));
-    const g = 255 - r;
-    const b = 0;
-  
-    console.log('RGB:', r, g, b);
-  
-    return `rgba(${r},${g},${b}, 1)`;
-  };
+  const [loading, setLoading] = useState(true);
   
   const getPixelValue = (value, minValue, maxValue) => {
     if (!isNaN(value)) {
         return pixelValue(value, minValue, maxValue);
     } else {
-        return '#FCE51C'
+        return '#f2f2f2'
     }
   }
 
@@ -74,7 +35,9 @@ const GeotiffLayer = ({ url, options }) => {
   
 
   useEffect(() => {
+    setLoading(true);
     const container = context.layerContainer || context.map;
+    
 
     // Fetch the GeoTIFF only when the URL changes
     fetch(url)
@@ -85,9 +48,7 @@ const GeotiffLayer = ({ url, options }) => {
           .then((georaster) => {
             console.log("georaster:", georaster);
             // Remove the previous GeoRasterLayer instance
-            if (geoTiffLayerRef.current) {
-              container.removeLayer(geoTiffLayerRef.current);
-            }
+            
 
           //Raster image calc.---
           let newgeorasterarr = 0;
@@ -106,7 +67,7 @@ const GeotiffLayer = ({ url, options }) => {
           
           const avgValue = Math.ceil(newgeorasterarr / _arrgeoraster.length);
           calculateValuesForLegend(avgValue, _arrgeoraster)
-          
+
             // Create a new GeoRasterLayer
             geoTiffLayerRef.current = new GeoRasterLayer({
               georaster: georaster,
@@ -118,10 +79,11 @@ const GeotiffLayer = ({ url, options }) => {
             });
 
             // Add the new GeoRasterLayer to the map
-            container.addLayer(geoTiffLayerRef.current);
-
-            // Fit the map bounds to the GeoRasterLayer
+            container.addLayer(geoTiffLayerRef.current);            
             map.fitBounds(geoTiffLayerRef.current.getBounds());
+            
+            // Set loading state to false once the new layer is rendered
+            setLoading(false);
           })
           .catch((error) => {
             console.error('Error parsing georaster:', error);
@@ -131,12 +93,15 @@ const GeotiffLayer = ({ url, options }) => {
     // Cleanup: Remove the GeoRasterLayer when the component is unmounted
     return () => {
       if (geoTiffLayerRef.current) {
+        console.log('cleaning...', container, geoTiffLayerRef.current)
         container.removeLayer(geoTiffLayerRef.current);
+        console.log('cleaning...==', container, geoTiffLayerRef.current)
       }
     };
   }, [context.layerContainer, context.map, map, url]);
 
-  return null;
+  // Only return null while loading is true
+  return loading ? null : <></>;
 };
 
 export default GeotiffLayer;
