@@ -121,16 +121,13 @@ export const extractArraysFromFeatureCollection = (featureCollection) => {
 }
 export const getBoundsCords = (arr) => {
   if(arr !== undefined)  {
-  //const newLatLng = to_lat_lng(arr)
-  //console.log('arr', arr)
-  //console.log('newLatLng', newLatLng)
   const cords = arr[0];
   // Calculate the opposite corners
   const minLat = Math.min(...cords.map(coord => coord[0]));
   const minLng = Math.min(...cords.map(coord => coord[1]));
   const maxLat = Math.max(...cords.map(coord => coord[0]));
   const maxLng = Math.max(...cords.map(coord => coord[1]));
-  //console.log('=]]', new LatLng(minLat, minLng), new LatLng(maxLat, maxLng))
+
   return new LatLngBounds(
     new LatLng(minLng, minLat ),
     new LatLng(maxLng, maxLat )

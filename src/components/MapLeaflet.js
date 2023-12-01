@@ -9,6 +9,7 @@ import EditControlFC from './EditControlFC';
 import { convertToGeoJSON } from '../data/utils'
 import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
 import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
+import CropInfo from './CropInfo'
 
 
 function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
@@ -18,10 +19,16 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
 
+  const cropsData = [
+    { year: 2023, crop: 'Rice', plantingDate: '2023-05-15' },
+    { year: 2022, crop: 'Wheat', plantingDate: '2022-04-20' },
+    // Add more crop data as needed
+  ];
+
+
   useEffect(() => {
     const createGeoJSON = () => {
       const geoCollectionData = convertToGeoJSON(boundariesData);
-      //console.log('use effect', geoCollection)
       setGeojson(geoCollectionData);
       setLoading(false);
     };
@@ -190,6 +197,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             handleLoadImage={handleLoadImage}  
             />
         </MapContainer>
+        <CropInfo selectedParty={selectedParty} />
       </div>
     </div>
     )

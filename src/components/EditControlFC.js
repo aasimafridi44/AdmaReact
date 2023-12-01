@@ -8,22 +8,6 @@ import GeoTiffLayer from './GeotiffLayer'
 const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) => {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
-  
-  const options = {
-    pixelValuesToColorFn: (values) => {
-      // transforming single value into an rgba color
-      const nir = values[0];
-
-      if (nir === 0) return;
-      // console.log("nir:", nir);
-      const r = (nir / 20000) * 255;
-      const g = 0;
-      const b = 0;
-      return `rgba(${r},${g},${b}, 1)`;
-    },
-    resolution: 64,
-    opacity: 1
-  };
 
   React.useEffect(() => {
     if (ref.current?.getLayers().length === 0 && geojson) {
@@ -110,11 +94,10 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
         }}
       />
     </FeatureGroup>
-    {!isEdit && satelliteImage && 
+    {!isEdit && satelliteImage &&  
       <>
-      {console.log('satelliteImage IFC', satelliteImage)}
-      <GeoTiffLayer url={satelliteImage} options={options} />
-    </>  
+        <GeoTiffLayer url={satelliteImage} />
+      </>  
     }
     </>
     }    
