@@ -29,7 +29,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
   useEffect(() => {
     const createGeoJSON = () => {
       const geoCollectionData = convertToGeoJSON(boundariesData);
-      //console.log('use effect', geoCollection)
       setGeojson(geoCollectionData);
       setLoading(false);
     };
@@ -198,7 +197,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             handleLoadImage={handleLoadImage}  
             />
         </MapContainer>
-        <CropInfo crops={cropsData} />
+        <CropInfo selectedParty={selectedParty} />
       </div>
     </div>
     )

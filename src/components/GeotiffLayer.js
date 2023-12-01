@@ -46,11 +46,7 @@ const GeotiffLayer = ({ url }) => {
         // Parse the GeoTIFF
         parseGeoraster(arrayBuffer)
           .then((georaster) => {
-            console.log("georaster:", georaster);
-            // Remove the previous GeoRasterLayer instance
             
-
-          //Raster image calc.---
           let newgeorasterarr = 0;
           let _arrgeoraster = [];
           georaster.values[0].forEach((element) => {
