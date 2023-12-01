@@ -4,14 +4,14 @@ import axios from 'axios';
 import { apiEndPoint } from '../data/utils'
 import { CircularProgress } from '@mui/material'
 
-const CropInfo = ({ selectedParty }) => {
+const CropInfo = ({ selectedParty, selectedField }) => {
   const [orderBy, setOrderBy] = React.useState('year');
   const [order, setOrder] = React.useState('asc');
   const [crops, SetCrops] = useState([])
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {   
-    axios.get(`${apiEndPoint}/SeasonalFields/GetSeasonalFields/${selectedParty.Id}`, {})
+    axios.get(`${apiEndPoint}/SeasonalFields/GetSeasonalFields/${selectedParty.Id}/seasonalfield/${selectedField.Id}`, {})
     .then((response) => {
         SetCrops(response.data.Data);
         setLoading(false); // Set loading to false once data is fetched
@@ -20,7 +20,7 @@ const CropInfo = ({ selectedParty }) => {
       console.error('Error fetching seasonal fields data:', error);
       setLoading(false); // Set loading to false once data is fetched
     });        
-  }, [selectedParty]);
+  }, [selectedField.Id, selectedParty]);
 
 
   const handleSort = (property) => {
@@ -52,18 +52,18 @@ const CropInfo = ({ selectedParty }) => {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'year'}
+                  active={orderBy === 'Year'}
                   direction={order}
-                  onClick={() => handleSort('year')}
+                  onClick={() => handleSort('Year')}
                 >
                   Year
                 </TableSortLabel>
               </TableCell>
               <TableCell>
                 <TableSortLabel
-                  active={orderBy === 'crop'}
+                  active={orderBy === 'Crop'}
                   direction={order}
-                  onClick={() => handleSort('crop')}
+                  onClick={() => handleSort('Crop')}
                 >
                   Crop
                 </TableSortLabel>
@@ -77,15 +77,6 @@ const CropInfo = ({ selectedParty }) => {
                   Planting Date
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'boundary'}
-                  direction={order}
-                  onClick={() => handleSort('boundary')}
-                >
-                  Boundary
-                </TableSortLabel>
-              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -94,7 +85,6 @@ const CropInfo = ({ selectedParty }) => {
                 <TableCell>{crop.Year}</TableCell>
                 <TableCell>{crop.crop}</TableCell>
                 <TableCell>{crop.plantingDate}</TableCell>
-                <TableCell>{crop.boundary}</TableCell>
               </TableRow>
             ))}
           </TableBody>

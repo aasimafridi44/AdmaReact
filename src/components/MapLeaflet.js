@@ -197,7 +197,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             handleLoadImage={handleLoadImage}  
             />
         </MapContainer>
-        <CropInfo selectedParty={selectedParty} />
+        <CropInfo selectedParty={selectedParty} selectedField={selectedField} />
       </div>
     </div>
     )
