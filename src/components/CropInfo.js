@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, TableSortLabel } from '@mui/material';
+import { Box,Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, TableSortLabel, Typography } from '@mui/material';
 import axios from 'axios';
 import { apiEndPoint } from '../data/utils'
 import { CircularProgress } from '@mui/material'
@@ -41,59 +41,79 @@ const CropInfo = ({ selectedParty, selectedField }) => {
 
   return (
     <>
+      <Box 
+          padding={2}
+          margin={0.5}
+          sx={{ lineHeight: 2, fontSize: 'h5.fontSize', fontWeight: 'bold' }}
+          >
+          {'Seasonal Field Details:'}
+          </Box>
+    
     {loading ? (
-        <CircularProgress /> // Display a loader while loading data
-      ) : 
-      (
-    <Paper style={{ marginTop: '30px'}}>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'Year'}
-                  direction={order}
-                  onClick={() => handleSort('Year')}
-                >
-                  Year
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'Crop'}
-                  direction={order}
-                  onClick={() => handleSort('Crop')}
-                >
-                  Crop
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={orderBy === 'plantingDate'}
-                  direction={order}
-                  onClick={() => handleSort('plantingDate')}
-                >
-                  Planting Date
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {sortedCrops.map((crop, index) => (
-              <TableRow key={index}>
-                <TableCell>{crop.Year}</TableCell>
-                <TableCell>{crop.crop}</TableCell>
-                <TableCell>{crop.plantingDate}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
-      )}
+      <CircularProgress /> // Display a loader while loading data
+    ) : 
+    (
+      <>
+        {sortedCrops.length < 1 ? (
+          <Box padding={2} textAlign={'center'} fontWeight={540}>
+            {'No records found. '}
+          </Box>
+
+        ) : (
+          <Paper style={{margin: 2,padding: 2, border: 1}}>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'Year'}
+                        direction={order}
+                        onClick={() => handleSort('Year')}
+                      >
+                        Year
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'Crop'}
+                        direction={order}
+                        onClick={() => handleSort('Crop')}
+                      >
+                        Crop
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'plantingDate'}
+                        direction={order}
+                        onClick={() => handleSort('plantingDate')}
+                      >
+                        Planting Date
+                      </TableSortLabel>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedCrops.map((crop, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{crop.Year}</TableCell>
+                      <TableCell>{crop.crop}</TableCell>
+                      <TableCell>{crop.plantingDate}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+        )
+
+        }
       </>
-  );
+    )
+    }
+    </>
+  )
 };
 
 export default CropInfo
