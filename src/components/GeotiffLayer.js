@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useLeafletContext } from "@react-leaflet/core";
-import * as L from 'leaflet';
 import { useMap } from "react-leaflet";
 import parseGeoraster from 'georaster'
 import GeoRasterLayer from "georaster-layer-for-leaflet";
@@ -94,7 +93,7 @@ const GeotiffLayer = ({ url }) => {
         console.log('cleaning...==', container, geoTiffLayerRef.current)
       }
     };
-  }, [context.layerContainer, context.map, map, url]);
+  }, [context.layerContainer, context.map, getPixelValue, map, url]);
 
   // Only return null while loading is true
   return loading ? null : <></>;

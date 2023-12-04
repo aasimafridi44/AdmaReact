@@ -2,14 +2,14 @@ import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css'
 import '../App.css';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
 import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
 import { convertToGeoJSON } from '../data/utils'
 import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
 import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
-import CropInfo from './CropInfo'
+
 
 
 function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
@@ -18,13 +18,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
   //console.log('boundariesData after', geoCollection)
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
-
-  const cropsData = [
-    { year: 2023, crop: 'Rice', plantingDate: '2023-05-15' },
-    { year: 2022, crop: 'Wheat', plantingDate: '2022-04-20' },
-    // Add more crop data as needed
-  ];
-
 
   useEffect(() => {
     const createGeoJSON = () => {
@@ -71,7 +64,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
           if(actionType === 'draw:edited'){
             //Get Boundary id
             GetBoundaryDetails(selectedParty, selectedField).then((boundaryDetails)=> {
-              const cascadeDelJobParams = {}
+              
               if(boundaryDetails.length > 0) {
                 boundaryDetails.map((res) => {
                   
@@ -197,7 +190,6 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             handleLoadImage={handleLoadImage}  
             />
         </MapContainer>
-        <CropInfo selectedParty={selectedParty} selectedField={selectedField} />
       </div>
     </div>
     )

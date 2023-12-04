@@ -1,14 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary, Button, Box, Typography, CircularProgress } from '@mui/material';
+import { Accordion, AccordionSummary,  Box, Typography, CircularProgress } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { apiEndPoint, headers } from '../data/utils';
 
-function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
-  const [fieldsData, setfieldsData] = useState([]);
+function FieldList({ selectedParty, selectedFarm, onFieldSelect, isExpanded, activeStep}) {
+  const [fieldsData, setFieldsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedField, setSelectedField] = useState(null);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(isExpanded);
 
 
   useEffect(() => {  
@@ -16,14 +16,18 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
     .then((response) => {
       const fieldData = response.data.Data; 
       //const selectedFieldId = result.filter((field) => field.FarmId === selectedFarm.id)
-      setfieldsData(fieldData);
+      setFieldsData(fieldData);
+      setExpanded(isExpanded)
       setLoading(false);
     })
     .catch((error) => {
       console.error('Error fetching field data:', error);
       setLoading(false); // Set loading to false once data is fetched
-    });        
-  }, [selectedFarm]);
+    });
+    return ()=> {
+      setExpanded(!expanded)
+    }       
+  }, [expanded, isExpanded, selectedFarm, selectedParty.Id]);
 
   const handleFieldClick = (field, selectedFarm) => {
     setSelectedField(field);
@@ -35,17 +39,11 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
     setExpanded(!expanded);
   };
 
-  const handleStepperReset = () => {
-    onFieldSelect(null);
-    setSelectedField(null);
-    setExpanded(true); // Show the party list
-  };
-
-  //const filteredFields = fieldsData.filter((field) => field.partyId === selectedParty.id);
-
   return (
     <>
-    {!selectedField && <Accordion expanded={expanded} onChange={handleToggleExpand}>
+    {console.log('field value in render', activeStep, expanded)}
+    {activeStep === 1  && 
+    <Accordion expanded={expanded} onChange={handleToggleExpand}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6">
           List of Fields for {selectedFarm.name}
@@ -69,14 +67,6 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect }) {
       }
     </Accordion>
     }
-    {selectedField && (
-        <>
-        <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
-          Field ({selectedField.Name})
-          <Button onClick={handleStepperReset}>X</Button>
-        </Box>
-        </>
-      )}
     </>
   );
 }
