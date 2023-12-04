@@ -8,7 +8,7 @@ import { calculateColorForRaster, calculateValuesForLegend } from '../service/Ra
 
 window.proj4 = proj4;
 
-const GeotiffLayer = ({ url }) => {
+const GeotiffLayer = ({ url,imageOverlay }) => {
   const geoTiffLayerRef = useRef();
   const context = useLeafletContext();
   const map = useMap();
@@ -70,12 +70,13 @@ const GeotiffLayer = ({ url }) => {
                 return getPixelValue(value, minValue, maxValue);
               },
               opacity: 0.7,
-              resolution: 256
+              resolution: 256,
+              caching: true
             });
 
             // Add the new GeoRasterLayer to the map
             container.addLayer(geoTiffLayerRef.current);            
-            map.fitBounds(geoTiffLayerRef.current.getBounds());
+            map.fitBounds(geoTiffLayerRef.current.getBounds(), {padding: 10});
             
             // Set loading state to false once the new layer is rendered
             setLoading(false);
@@ -87,16 +88,14 @@ const GeotiffLayer = ({ url }) => {
 
     // Cleanup: Remove the GeoRasterLayer when the component is unmounted
     return () => {
-      if (geoTiffLayerRef.current) {
-        console.log('cleaning...', container, geoTiffLayerRef.current)
+      if (geoTiffLayerRef.current) {        
         container.removeLayer(geoTiffLayerRef.current);
-        console.log('cleaning...==', container, geoTiffLayerRef.current)
       }
     };
-  }, [context.layerContainer, context.map, getPixelValue, map, url]);
+  }, [context.layerContainer, context.map, getPixelValue, map, url, imageOverlay]);
 
   // Only return null while loading is true
-  return loading ? null : <></>;
+  return loading || imageOverlay ? null : <></>;
 };
 
 export default GeotiffLayer;

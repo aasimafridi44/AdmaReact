@@ -108,7 +108,6 @@ function createDrawElement(props, context) {
   if (position) {
     options.position = position;
   }
-
   return new Control.Draw(options);
 }
 

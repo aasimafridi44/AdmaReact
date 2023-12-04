@@ -4,7 +4,7 @@ import FarmList from './components/FarmList'
 import FieldList from './components/FieldList'
 import { ToastContainer } from 'react-toastify';
 import MapLeaflet from './components/MapLeaflet';
-import { Box, Button, Container, Grid, Stepper,Step,StepLabel } from '@mui/material';
+import { Box, Button, Container, Checkbox, FormControlLabel, Grid, Stepper,Step,StepLabel } from '@mui/material';
 import { GetSatelliteImageByBid } from './components/GetBoundaryImage'
 import { GetBoundaryDetails } from './components/GetBoundary'
 import  CropInfo from './components/CropInfo'
@@ -19,7 +19,8 @@ function App() {
   const [selectedField, setSelectedField] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeStep, setActiveStep] = useState(null);
-  const [satelliteImage, SetSatelliteImage] = useState('')
+  const [satelliteImage, setSatelliteImage] = useState('')
+  const [showImageOverlay, setShowImageOverlay] = useState(false)
 
   const steps = ['Party', 'Farm', 'Field'];
 
@@ -60,7 +61,7 @@ function App() {
         let sImage = GetSatelliteImageByBid(selectedParty, coordinatesData[0]?.boundaryId).then((res) =>{
           sImage = res;
           if(sImage !== ''){
-            SetSatelliteImage(sImage)
+            setSatelliteImage(sImage)
           }
         })
       }
@@ -70,6 +71,9 @@ function App() {
       setLoading(false);
       console.error('Error fetching boundary cords data:', error);
     });
+  } else {
+    setPolygonData([]);
+    setShowImageOverlay(false)
   }
   };
 
@@ -78,12 +82,15 @@ function App() {
     let sImage = GetSatelliteImageByBid(selectedParty, bid).then((res) =>{
       sImage = res;
       if(sImage !== ''){
-        SetSatelliteImage(sImage)
+        setSatelliteImage(sImage)
       } else {
-        SetSatelliteImage('')
+        setSatelliteImage('')
       }
     })
+  }
 
+  const handleShowImage = (val) => {
+    setShowImageOverlay(val)
   }
 
   return (
@@ -135,10 +142,15 @@ function App() {
         {selectedField &&
             <CropInfo selectedParty={selectedParty} selectedField={selectedField} />
         }
+        {selectedField && satelliteImage &&
+          <>
+          <Button variant="outlined" onClick={() => handleShowImage(true)}>Click button to see Image Overlay on map.</Button></>
+          
+        }
         </Grid>
         <Grid item xs={8} style={{border:'2px'}}>
         <>
-          {(
+        {selectedField && polygonData && (
             
             <MapLeaflet 
               boundariesData={polygonData} 
@@ -147,6 +159,16 @@ function App() {
               getBoundaryHandler={handleFieldSelect} 
               satelliteImage={satelliteImage}
               handleLoadImage={handleLoadImage}
+              control={true}
+              imageOverlay={showImageOverlay}
+              />
+           
+          )}
+          {!selectedField  && (
+            
+            <MapLeaflet 
+              boundariesData={[]}
+              control={false}
               />
            
           )}

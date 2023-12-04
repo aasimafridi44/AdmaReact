@@ -41,7 +41,6 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect, isExpanded, act
 
   return (
     <>
-    {console.log('field value in render', activeStep, expanded)}
     {activeStep === 1  && 
     <Accordion expanded={expanded} onChange={handleToggleExpand}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>

@@ -12,7 +12,9 @@ import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
 
 
 
-function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
+const MapLeaflet = 
+    ({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage, control, imageOverlay}) => 
+  {
   //console.log('boundariesData pre', boundariesData)
   const geoCollection = convertToGeoJSON(boundariesData)
   //console.log('boundariesData after', geoCollection)
@@ -27,7 +29,10 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     };
 
     createGeoJSON();
-  }, [boundariesData]);
+    return() => {
+      
+    }
+  }, [boundariesData, selectedField]);
 
   const handleBoundaryDelete = (actionType, selectedParty, boundaryId) => {
     if(actionType === 'draw:deleted'){
@@ -168,7 +173,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
         <Typography display='block' align='center' ><br/>{`Please wait while the boundary is updated ...`}</Typography>
       </>
         ) : (
-     geojson && (
+          geojson && (
     <div style={{ display: 'flex', height: '100vh', marginTop: '20px' }}>
       <ToastContainer />
       <div style={{ width: '100%' }}>
@@ -176,6 +181,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
           center={[-3.909050573693678, -39.13905835799129]}
           zoom={13}
           scrollWheelZoom={false}
+          zoomAnimation={true}
+          zoomAnimationThreshold={1000}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -188,6 +195,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             satelliteImage={satelliteImage}
             onBoundaryDelete={handleBoundaryDelete} 
             handleLoadImage={handleLoadImage}  
+            control={control}
+            imageOverlay={imageOverlay}
             />
         </MapContainer>
       </div>

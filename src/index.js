@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { googleMapKey } from './data/utils'
-import { LoadScript } from "@react-google-maps/api";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
