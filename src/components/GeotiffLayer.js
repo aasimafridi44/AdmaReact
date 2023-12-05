@@ -8,7 +8,7 @@ import { calculateColorForRaster, calculateValuesForLegend } from '../service/Ra
 
 window.proj4 = proj4;
 
-const GeotiffLayer = ({ url,imageOverlay }) => {
+const GeotiffLayer = ({ url,imageOverlay, handleShowProgressImage }) => {
   const geoTiffLayerRef = useRef();
   const context = useLeafletContext();
   const map = useMap();
@@ -76,10 +76,11 @@ const GeotiffLayer = ({ url,imageOverlay }) => {
 
             // Add the new GeoRasterLayer to the map
             container.addLayer(geoTiffLayerRef.current);            
-            map.fitBounds(geoTiffLayerRef.current.getBounds(), {padding: 10});
+            map.fitBounds(geoTiffLayerRef.current.getBounds());
             
             // Set loading state to false once the new layer is rendered
             setLoading(false);
+            handleShowProgressImage(false)
           })
           .catch((error) => {
             console.error('Error parsing georaster:', error);

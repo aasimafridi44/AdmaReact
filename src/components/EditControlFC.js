@@ -5,7 +5,7 @@ import  EditControl  from './EditControl';
 import GeoTiffLayer from './GeotiffLayer'
 
 
-const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete , control, imageOverlay }) => {
+const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete , control, imageOverlay, handleShowProgressImage }) => {
   const ref = React.useRef(null);
   const [isEdit, SetIsEdit] = React.useState(false)
 
@@ -96,7 +96,7 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
     </FeatureGroup>
     {imageOverlay && !isEdit && satelliteImage &&  
       <>
-        <GeoTiffLayer url={satelliteImage} imageOverlay={imageOverlay} />
+        <GeoTiffLayer url={satelliteImage} imageOverlay={imageOverlay} handleShowProgressImage={handleShowProgressImage} />
       </> }
     </>
   );

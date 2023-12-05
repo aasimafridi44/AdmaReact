@@ -21,6 +21,7 @@ function App() {
   const [activeStep, setActiveStep] = useState(null);
   const [satelliteImage, setSatelliteImage] = useState('')
   const [showImageOverlay, setShowImageOverlay] = useState(false)
+  const [showProgress, setShowProgress] = useState(false)
 
   const steps = ['Party', 'Farm', 'Field'];
 
@@ -91,6 +92,10 @@ function App() {
 
   const handleShowImage = (val) => {
     setShowImageOverlay(val)
+    setShowProgress(true)
+  }
+  const handleShowProgressImage = (val) => {
+    setShowProgress(val)
   }
 
   return (
@@ -144,7 +149,14 @@ function App() {
         }
         {selectedField && satelliteImage &&
           <>
-          <Button variant="outlined" onClick={() => handleShowImage(true)}>Click button to see Image Overlay on map.</Button></>
+          <Box component={"div"}  margin={2}>
+            <Button variant="outlined" margin={2} onClick={() => handleShowImage(true)}>Click button to see Image Overlay on map.</Button>
+          </Box>
+          {showProgress && <Box component={"div"}  margin={2}>
+            Please wait while satellite image getting load on map...
+          </Box>
+          }
+          </>
           
         }
         </Grid>
@@ -161,6 +173,7 @@ function App() {
               handleLoadImage={handleLoadImage}
               control={true}
               imageOverlay={showImageOverlay}
+              handleShowProgressImage={handleShowProgressImage}
               />
            
           )}

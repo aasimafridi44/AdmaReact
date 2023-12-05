@@ -13,7 +13,7 @@ import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
 
 
 const MapLeaflet = 
-    ({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage, control, imageOverlay}) => 
+    ({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage, control, imageOverlay, handleShowProgressImage}) => 
   {
   //console.log('boundariesData pre', boundariesData)
   const geoCollection = convertToGeoJSON(boundariesData)
@@ -197,6 +197,7 @@ const MapLeaflet =
             handleLoadImage={handleLoadImage}  
             control={control}
             imageOverlay={imageOverlay}
+            handleShowProgressImage={handleShowProgressImage}
             />
         </MapContainer>
       </div>
