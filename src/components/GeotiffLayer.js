@@ -85,6 +85,8 @@ const GeotiffLayer = ({ url,imageOverlay, handleShowProgressImage }) => {
           })
           .catch((error) => {
             console.error('Error parsing georaster:', error);
+            handleShowProgressImage(false)
+            setLoading(false);
           });
       });
 

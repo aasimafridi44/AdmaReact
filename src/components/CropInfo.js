@@ -46,7 +46,7 @@ const CropInfo = ({ selectedParty, selectedField }) => {
           margin={0.5}
           sx={{ lineHeight: 2, fontSize: 'h5.fontSize', fontWeight: 'bold' }}
           >
-          {'Seasonal Field Details:'}
+          {'Seasonal field details:'}
           </Box>
     
     {loading ? (
@@ -54,12 +54,7 @@ const CropInfo = ({ selectedParty, selectedField }) => {
     ) : 
     (
       <>
-        {sortedCrops.length < 1 ? (
-          <Box padding={2} textAlign={'center'} fontWeight={540}>
-            {'No records found. '}
-          </Box>
 
-        ) : (
           <Paper style={{margin: 1,padding: 0, border: 1}}>
             <TableContainer>
               <Table>
@@ -104,21 +99,24 @@ const CropInfo = ({ selectedParty, selectedField }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sortedCrops.map((crop, index) => (
-                    <TableRow key={index}>
-                      <TableCell>{crop.Year}</TableCell>
-                      <TableCell>{crop.crop}</TableCell>
-                      <TableCell>{crop.plantingDate}</TableCell>
-                      <TableCell>{crop.boundary}</TableCell>
-                    </TableRow>
-                  ))}
+                {sortedCrops.length < 1 ? (
+                  <TableRow key={'no-records'}>
+                    <TableCell align="center" colSpan={4}>{'No records found. '}</TableCell>
+                  </TableRow>
+                ) :(
+                sortedCrops.map((crop, index) => (
+                            <TableRow key={index}>
+                              <TableCell>{crop.Year}</TableCell>
+                              <TableCell>{crop.crop}</TableCell>
+                              <TableCell>{crop.plantingDate}</TableCell>
+                              <TableCell>{crop.boundary}</TableCell>
+                            </TableRow>
+                          ))
+                )}
                 </TableBody>
               </Table>
             </TableContainer>
           </Paper>
-        )
-
-        }
       </>
     )
     }

@@ -4,8 +4,11 @@ import { Accordion,
   AccordionSummary, 
   AccordionDetails, 
   Typography, 
-  CircularProgress, 
-  Box } from '@mui/material';
+  CircularProgress,
+  Divider,
+  List,
+  ListItem,
+  ListItemText } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { headers, apiEndPoint } from '../data/utils';
 
@@ -51,17 +54,28 @@ function PartyList({ onPartySelect, activeStep, isExpanded }) {
         <CircularProgress /> // Display a loader while loading data
         ) : (
           parties &&
-          parties.map((party) => (
-              
-            <Box 
-               key={party.Id}
-               onClick={() => handlePartyClick(party)}
-               padding={1}
-               border={0}
-               borderRadius={4}
-              >
-                <Typography style={{ cursor: 'pointer',  background: selectedParty === party ? 'lightblue' : 'white' }}>{party.Name}</Typography>
-              </Box>
+          parties.map((party, index) => (
+            <List  sx={{
+                bgcolor: 'background.paper', 
+                cursor: 'pointer',
+                '&:hover': {
+                    backgroundColor: '#f0f0f0', // Change this to your desired hover color
+                },
+                background: selectedParty?.Id === party?.Id ? 'lightblue' : 'white'
+                }}  key={party.Id}  onClick={() => handlePartyClick(party)}>
+              <ListItem alignItems="flex-start">
+                <ListItemText className="MuiListItemText-multiline" primary={party.Name}
+                  sx={{
+                      '&.MuiListItemText-multiline': {
+                        '& .MuiTypography-root': {
+                          lineHeight: '15px',
+                        },
+                      },
+                    }}
+                />
+              </ListItem>
+              {index !== parties.length - 1 &&<Divider component="li" /> }
+            </List>
         ))
         )
         }
