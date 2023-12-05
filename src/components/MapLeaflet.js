@@ -178,7 +178,7 @@ const MapLeaflet =
       <ToastContainer />
       <div style={{ width: '100%' }}>
         <MapContainer
-          center={[-3.909050573693678, -39.13905835799129]}
+          center={[44.9772995, -93.2654692]}
           zoom={13}
           scrollWheelZoom={false}
           zoomAnimation={true}
@@ -186,7 +186,7 @@ const MapLeaflet =
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            url={'http://{s}.tile.osm.org/{z}/{x}/{y}.png'}
           />
           <EditControlFC 
             geojson={geojson} 

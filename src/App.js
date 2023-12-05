@@ -157,7 +157,7 @@ function App() {
             </Button>
           </Box>
           {showProgress && <Box component={"div"}  margin={2}>
-            Please wait while satellite image getting load on map...
+            Please wait while satellite image getting load on map...{showProgress}
           </Box>
           }
           </>
