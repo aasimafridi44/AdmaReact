@@ -174,7 +174,7 @@ const MapLeaflet =
       </>
         ) : (
           geojson && (
-    <div style={{ display: 'flex', height: '80vh', marginTop: '20px' }}>
+    <div style={{ display: 'flex', height: '78vh', marginTop: '20px' }}>
       <ToastContainer />
       <div style={{ width: '100%' }}>
         <MapContainer
