@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Box,Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, TableSortLabel, Typography } from '@mui/material';
+import { Box,Paper, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, TableSortLabel } from '@mui/material';
 import axios from 'axios';
 import { apiEndPoint } from '../data/utils'
 import { CircularProgress } from '@mui/material'

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useLeafletContext } from "@react-leaflet/core";
-import * as L from 'leaflet';
 import { useMap } from "react-leaflet";
 import parseGeoraster from 'georaster'
 import GeoRasterLayer from "georaster-layer-for-leaflet";
@@ -9,7 +8,7 @@ import { calculateColorForRaster, calculateValuesForLegend } from '../service/Ra
 
 window.proj4 = proj4;
 
-const GeotiffLayer = ({ url }) => {
+const GeotiffLayer = ({ url,imageOverlay, handleShowProgressImage }) => {
   const geoTiffLayerRef = useRef();
   const context = useLeafletContext();
   const map = useMap();
@@ -71,7 +70,8 @@ const GeotiffLayer = ({ url }) => {
                 return getPixelValue(value, minValue, maxValue);
               },
               opacity: 0.7,
-              resolution: 256
+              resolution: 256,
+              caching: true
             });
 
             // Add the new GeoRasterLayer to the map
@@ -80,6 +80,7 @@ const GeotiffLayer = ({ url }) => {
             
             // Set loading state to false once the new layer is rendered
             setLoading(false);
+            handleShowProgressImage(false)
           })
           .catch((error) => {
             console.error('Error parsing georaster:', error);
@@ -88,16 +89,14 @@ const GeotiffLayer = ({ url }) => {
 
     // Cleanup: Remove the GeoRasterLayer when the component is unmounted
     return () => {
-      if (geoTiffLayerRef.current) {
-        console.log('cleaning...', container, geoTiffLayerRef.current)
+      if (geoTiffLayerRef.current) {        
         container.removeLayer(geoTiffLayerRef.current);
-        console.log('cleaning...==', container, geoTiffLayerRef.current)
       }
     };
-  }, [context.layerContainer, context.map, map, url]);
+  }, [context.layerContainer, context.map, getPixelValue, map, url, imageOverlay]);
 
   // Only return null while loading is true
-  return loading ? null : <></>;
+  return loading || imageOverlay ? null : <></>;
 };
 
 export default GeotiffLayer;

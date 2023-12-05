@@ -5,19 +5,19 @@ import { Accordion,
   AccordionDetails, 
   Typography, 
   CircularProgress, 
-  Box,
-  Button } from '@mui/material';
+  Box } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { headers, apiEndPoint } from '../data/utils';
 
 
-function PartyList({ onPartySelect, activeStep }) {
+function PartyList({ onPartySelect, activeStep, isExpanded }) {
   const [parties, setParties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedParty, setSelectedParty] = useState(null);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(isExpanded);
 
   useEffect(() => {
+    setExpanded(isExpanded)
     axios.get(`${apiEndPoint}/Party/GetAllParty`, {headers: headers})
     .then((response) => {
       setParties(response.data.Data);
@@ -27,7 +27,7 @@ function PartyList({ onPartySelect, activeStep }) {
       console.error('Error fetching party data:', error);
       setLoading(false); // Set loading to false in case of an error
     });        
-  }, []);
+  },[activeStep, isExpanded]);
 
   const handlePartyClick = (party) => {
     onPartySelect(party);
@@ -37,12 +37,6 @@ function PartyList({ onPartySelect, activeStep }) {
   };
   const handleToggleExpand = () => {
     setExpanded(!expanded);
-  };
-
-  const handleStepperReset = () => {
-    onPartySelect(null);
-    setSelectedParty(null);
-    setExpanded(true); // Show the party list
   };
 
   return (
@@ -74,14 +68,6 @@ function PartyList({ onPartySelect, activeStep }) {
         </AccordionDetails>
      </Accordion>
       }
-      {selectedParty && (
-        <>
-        <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
-          Party({selectedParty.Name})
-          <Button onClick={handleStepperReset}>X</Button>
-        </Box>
-        </>
-      )}
     </>
   );
 }

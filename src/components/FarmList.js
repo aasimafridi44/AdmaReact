@@ -1,48 +1,48 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress, Button } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress } from '@mui/material';
 import { apiEndPoint, headers } from '../data/utils';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
-function FarmList({ selectedParty, farms, onFarmSelect }) {
+function FarmList({ selectedParty, farms, onFarmSelect, isExpanded, activeStep }) {
 
  const [farmsData, setFarmsData] = useState([]);
  const [loading, setLoading] = useState(true);
  const [selectedFarm, setSelectedFarm] = useState(null);
- const [expanded, setExpanded] = useState(true);
+ const [expanded, setExpanded] = useState(isExpanded);
 
 
-  useEffect(() => {   
+  useEffect(() => { 
+   
     axios.get(`${apiEndPoint}/Farm/GetFarmByPartyId/${selectedParty.Id}`, { headers })
     .then((response) => {
         setFarmsData(response.data.Data);
         setLoading(false); // Set loading to false once data is fetched
+        setExpanded(isExpanded)
     })
     .catch((error) => {
       console.error('Error fetching party data:', error);
       setLoading(false); // Set loading to false once data is fetched
-    });        
-  }, [selectedParty]);
+    });
+    return ()=> {
+      setExpanded(!expanded)
+    }
+  }, [selectedParty, isExpanded, activeStep, expanded]);
 
     const handleFarmClick = (farm) => {
-        setSelectedFarm(farm);
-        onFarmSelect(farm);
-        setExpanded(false);
+      setExpanded(false);
+      setSelectedFarm(farm);
+      onFarmSelect(farm);  
     };
 
     const handleToggleExpand = () => {
       setExpanded(!expanded);
     };
-    const handleStepperReset = () => {
-      onFarmSelect(null);
-      setSelectedFarm(null);
-      setExpanded(true);
-    };
-
+    
     return (
       <>
-      {!selectedFarm &&
+      {activeStep === 0 &&
        <Accordion expanded={expanded} onChange={handleToggleExpand}>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="h6">
@@ -69,14 +69,7 @@ function FarmList({ selectedParty, farms, onFarmSelect }) {
         </AccordionDetails>
       </Accordion>
       }
-      {selectedFarm && (
-        <>
-        <Box component={"span"} boxShadow={4} borderRadius={2} margin={2} padding={2}>
-          Farm ({selectedFarm.name})
-          <Button onClick={handleStepperReset}>X</Button>
-        </Box>
-        </>
-      )}
+      
       </>
     );
 }

@@ -1,15 +1,17 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import * as L from 'leaflet';
-import { FeatureGroup } from 'react-leaflet';
+import { FeatureGroup,  useMap } from 'react-leaflet';
 import  EditControl  from './EditControl';
 import GeoTiffLayer from './GeotiffLayer'
 
 
-const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete }) => {
+const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete , control, imageOverlay, handleShowProgressImage }) => {
   const ref = React.useRef(null);
+  const map = useMap();
   const [isEdit, SetIsEdit] = React.useState(false)
 
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (ref.current?.getLayers().length === 0 && geojson) {
       L.geoJSON(geojson).eachLayer((layer) => {
         if (
@@ -27,9 +29,41 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
         }
       });
     }
-    
     SetIsEdit(false)
+    return() => {
+      //ref.current?.removeLayer()
+    }
   }, [geojson, satelliteImage]);
+
+  useEffect(() => {
+    // Set map view based on coordinates from geojson
+    if (geojson?.features && geojson.features.length > 0) {
+      const coordinates = geojson.features[0]?.geometry?.coordinates;
+      if (coordinates) {
+        const centroid = calculateCentroid(coordinates);
+        //console.log('slice ', centroid) //Output - [-3.9328991666666666, -38.77533916666666]
+        //console.log('Original Coordinates:', coordinates);
+        //console.log('Calculated Centroid:', centroid);
+        map.flyTo(centroid, 13); // Adjust the zoom level (13 is just an example)
+        //map.flyTo([-3.9328991666666666, -38.77533916666666], 16);
+      }
+    }
+  }, [geojson, map]);
+
+  const calculateCentroid  = (coordinates) => {
+    let [sumLat, sumLng] = [0, 0];
+  
+    // Calculate the sum of latitudes and longitudes
+    coordinates[0].forEach(([lng, lat]) => {
+      sumLat += lat;
+      sumLng += lng;
+    });
+  
+    // Calculate the centroid
+    const centroid = [sumLat / coordinates[0].length, sumLng / coordinates[0].length];
+  
+    return centroid;
+  }
 
   const handleChange = (e) => {
     const geo = ref.current?.toGeoJSON();
@@ -67,15 +101,13 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
   //[[geojson?.features[0]?.geometry?.coordinates]]
   // [ [ -3.93012, -39.198528 ], [ -3.880602, -39.093907 ] ]
   //""https://tavant-my.sharepoint.com/personal/aasim_khan_tavant_com/Documents/aasim-field-8.png"
-  console.log('cords bound--',geojson, geojson?.features.length)
+  //console.log('cords bound--',geojson, geojson?.features.length)
   
   return (
     <>
-    {
-    <>
-    
+
     <FeatureGroup ref={ref}>
-      <EditControl
+    { control && <EditControl
         position="topright"
         onEdited={handleChange}
         onCreated={handleChange}
@@ -86,21 +118,19 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
         onDeleteStart={handleBoundaryDeleteStart}
         draw={{
           rectangle: false,
-          circle: true,
-          polyline: true,
-          polygon: true,
+          circle: control ? true : false,
+          polyline: control ? true : false,
+          polygon: control ? true : false,
           marker: false,
-          circlemarker: false,
+          circlemarker: false
         }}
       />
+      }
     </FeatureGroup>
-    {!isEdit && satelliteImage &&  
+    {imageOverlay && !isEdit && satelliteImage &&  
       <>
-        <GeoTiffLayer url={satelliteImage} />
-      </>  
-    }
-    </>
-    }    
+        <GeoTiffLayer url={satelliteImage} imageOverlay={imageOverlay} handleShowProgressImage={handleShowProgressImage} />
+      </> }
     </>
   );
 });

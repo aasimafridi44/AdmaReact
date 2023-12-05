@@ -2,29 +2,24 @@ import React, { useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-draw/dist/leaflet.draw.css'
 import '../App.css';
-import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import { ToastContainer, toast } from 'react-toastify';
 import { CircularProgress, Typography } from '@mui/material'
 import EditControlFC from './EditControlFC';
 import { convertToGeoJSON } from '../data/utils'
 import { GetBoundaryDetails, CreateBoundary } from './GetBoundary'
 import { DeleteSatelliteImageByJob } from './GetBoundaryImage'
-import CropInfo from './CropInfo'
 
 
-function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage}) {
+
+const MapLeaflet = 
+    ({boundariesData, selectedParty, selectedField, getBoundaryHandler, satelliteImage, handleLoadImage, control, imageOverlay, handleShowProgressImage}) => 
+  {
   //console.log('boundariesData pre', boundariesData)
   const geoCollection = convertToGeoJSON(boundariesData)
   //console.log('boundariesData after', geoCollection)
   const [geojson, setGeojson] = React.useState(geoCollection);
   const [loading, setLoading] = React.useState(true);
-
-  const cropsData = [
-    { year: 2023, crop: 'Rice', plantingDate: '2023-05-15' },
-    { year: 2022, crop: 'Wheat', plantingDate: '2022-04-20' },
-    // Add more crop data as needed
-  ];
-
 
   useEffect(() => {
     const createGeoJSON = () => {
@@ -34,7 +29,10 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
     };
 
     createGeoJSON();
-  }, [boundariesData]);
+    return() => {
+      
+    }
+  }, [boundariesData, selectedField]);
 
   const handleBoundaryDelete = (actionType, selectedParty, boundaryId) => {
     if(actionType === 'draw:deleted'){
@@ -71,7 +69,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
           if(actionType === 'draw:edited'){
             //Get Boundary id
             GetBoundaryDetails(selectedParty, selectedField).then((boundaryDetails)=> {
-              const cascadeDelJobParams = {}
+              
               if(boundaryDetails.length > 0) {
                 boundaryDetails.map((res) => {
                   
@@ -175,7 +173,7 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
         <Typography display='block' align='center' ><br/>{`Please wait while the boundary is updated ...`}</Typography>
       </>
         ) : (
-     geojson && (
+          geojson && (
     <div style={{ display: 'flex', height: '100vh', marginTop: '20px' }}>
       <ToastContainer />
       <div style={{ width: '100%' }}>
@@ -183,6 +181,8 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
           center={[-3.909050573693678, -39.13905835799129]}
           zoom={13}
           scrollWheelZoom={false}
+          zoomAnimation={true}
+          zoomAnimationThreshold={1000}
         >
           <TileLayer
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -195,9 +195,11 @@ function MapLeaflet({boundariesData, selectedParty, selectedField, getBoundaryHa
             satelliteImage={satelliteImage}
             onBoundaryDelete={handleBoundaryDelete} 
             handleLoadImage={handleLoadImage}  
+            control={control}
+            imageOverlay={imageOverlay}
+            handleShowProgressImage={handleShowProgressImage}
             />
         </MapContainer>
-        <CropInfo selectedParty={selectedParty} selectedField={selectedField} />
       </div>
     </div>
     )

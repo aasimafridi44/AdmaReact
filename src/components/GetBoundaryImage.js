@@ -6,7 +6,6 @@ export const GetSatelliteImageByBid = async (selectedParty, selectedBid) => {
     try {
         const response = await axios.get(`${apiEndPoint}/Boundary/GetBoundaryImage/${selectedParty.Id}/${selectedBid}`)
         const satelliteImage = response.data.Data
-        console.log('satelliteImage', satelliteImage)
         return satelliteImage
     }
     catch(error) {
