@@ -1,6 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, CircularProgress } from '@mui/material';
+import { Accordion, 
+  AccordionSummary, 
+  AccordionDetails, 
+  Divider,
+  List,
+  ListItem,
+  ListItemText, 
+  Typography, 
+  CircularProgress } from '@mui/material';
 import { apiEndPoint, headers } from '../data/utils';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -53,18 +61,29 @@ function FarmList({ selectedParty, farms, onFarmSelect, isExpanded, activeStep }
           {loading ? (
           <CircularProgress /> // Display a loader while loading data
         ) : 
-        farmsData.map((farm) => (
-              <Box 
-                key={farm.id}
-                onClick={() => handleFarmClick(farm)}
-                padding={1}
-                border={0}
-                borderRadius={4}
-              >
-                <Typography style={{ cursor: 'pointer',  background: selectedFarm?.id === farm.id ? 'lightblue' : 'white' }}>{farm.name}</Typography>
-              </Box> 
-              ))
-          
+        farmsData.map((farm, index) => (
+          <List  sx={{ 
+                bgcolor: 'background.paper', 
+                cursor: 'pointer',
+                '&:hover': {
+                    backgroundColor: '#f0f0f0', // Change this to your desired hover color
+                  },
+                  background: selectedFarm?.id === farm?.id ? 'lightblue' : 'white'
+                }} key={farm.id} onClick={() => handleFarmClick(farm)}>
+              <ListItem alignItems="flex-start">
+                <ListItemText className="MuiListItemText-multiline" primary={farm.name}
+                  sx={{
+                      '&.MuiListItemText-multiline': {
+                        '& .MuiTypography-root': {
+                          lineHeight: '15px',
+                        },
+                      },
+                    }}
+                />
+              </ListItem>
+              {index !== farm.length - 1 &&<Divider /> }
+            </List>
+          ))
           }
         </AccordionDetails>
       </Accordion>

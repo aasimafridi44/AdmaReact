@@ -1,6 +1,15 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import { Accordion, AccordionSummary,  Box, Typography, CircularProgress } from '@mui/material';
+import { Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  CircularProgress,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Typography, 
+  } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { apiEndPoint, headers } from '../data/utils';
 
@@ -48,22 +57,36 @@ function FieldList({ selectedParty, selectedFarm, onFieldSelect, isExpanded, act
           List of Fields for {selectedFarm.name}
         </Typography>
       </AccordionSummary>
+      <AccordionDetails>
       { loading ? (
         <CircularProgress /> // Display a loader while loading data
       ) : 
-        fieldsData.map((field) => (
-          <Box 
-                key={field.Id}
-                padding={1}
-                border={0}
-                onClick={() => handleFieldClick(field, selectedFarm)}
-                style={{background: selectedField === field ? 'lightblue' : 'white' ,  cursor: 'pointer' }}
-            >
-            <Typography style={{ cursor: 'pointer',  background: selectedField === field  ? 'lightblue' : 'white' }}>{field.Name}</Typography>
-          </Box>
+        fieldsData.map((field, index) => (
+          <List  sx={{ 
+                bgcolor: 'background.paper', 
+                cursor: 'pointer',
+                '&:hover': {
+                    backgroundColor: '#f0f0f0', // Change this to your desired hover color
+                  },
+                background: selectedField?.Id === field?.Id ? 'lightblue' : 'white'
+                }}  key={field.Id} onClick={() => handleFieldClick(field, selectedFarm)}>
+              <ListItem alignItems="flex-start">
+                <ListItemText className="MuiListItemText-multiline" primary={field.Name}
+                  sx={{
+                      '&.MuiListItemText-multiline': {
+                        '& .MuiTypography-root': {
+                          lineHeight: '15px',
+                        },
+                      },
+                    }}
+                />
+              </ListItem>
+              {index !== field.length - 1 &&<Divider /> }
+            </List>
         ))
       
       }
+      </AccordionDetails>
     </Accordion>
     }
     </>

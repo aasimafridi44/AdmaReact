@@ -42,7 +42,6 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
       if (coordinates) {
         const bounds = calculateCentroid(coordinates);
         map.flyTo(bounds);
-        //map.flyTo([-3.9328991666666666, -38.77533916666666], 16);
       }
     }
   }, [geojson, map]);
