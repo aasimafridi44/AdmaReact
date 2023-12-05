@@ -60,7 +60,7 @@ const CropInfo = ({ selectedParty, selectedField }) => {
           </Box>
 
         ) : (
-          <Paper style={{margin: 2,padding: 2, border: 1}}>
+          <Paper style={{margin: 1,padding: 0, border: 1}}>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -92,6 +92,15 @@ const CropInfo = ({ selectedParty, selectedField }) => {
                         Planting Date
                       </TableSortLabel>
                     </TableCell>
+                    <TableCell>
+                      <TableSortLabel
+                        active={orderBy === 'boundary'}
+                        direction={order}
+                        onClick={() => handleSort('boundary')}
+                      >
+                        Bundary size
+                      </TableSortLabel>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -100,6 +109,7 @@ const CropInfo = ({ selectedParty, selectedField }) => {
                       <TableCell>{crop.Year}</TableCell>
                       <TableCell>{crop.crop}</TableCell>
                       <TableCell>{crop.plantingDate}</TableCell>
+                      <TableCell>{crop.boundary}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

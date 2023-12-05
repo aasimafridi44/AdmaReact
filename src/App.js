@@ -153,7 +153,7 @@ function App() {
           <>
           <Box component={"div"}  margin={2}>
             <Button variant="outlined" color="success" margin={2} onClick={() => handleShowImage(true)}>
-              Click button to see Image Overlay on map.
+              Click button to see Image Overlay on map
             </Button>
           </Box>
           {showProgress && <Box component={"div"}  margin={2}>

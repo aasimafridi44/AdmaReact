@@ -76,7 +76,8 @@ const GeotiffLayer = ({ url,imageOverlay, handleShowProgressImage }) => {
 
             // Add the new GeoRasterLayer to the map
             container.addLayer(geoTiffLayerRef.current);            
-            map.fitBounds(geoTiffLayerRef.current.getBounds());
+
+            map.flyToBounds(geoTiffLayerRef.current.getBounds());
             
             // Set loading state to false once the new layer is rendered
             setLoading(false);

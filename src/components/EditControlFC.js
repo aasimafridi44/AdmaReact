@@ -40,15 +40,26 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
     if (geojson?.features && geojson.features.length > 0) {
       const coordinates = geojson.features[0]?.geometry?.coordinates;
       if (coordinates) {
-        const centroid = calculateCentroid(coordinates);
-        //console.log('slice ', centroid) //Output - [-3.9328991666666666, -38.77533916666666]
-        //console.log('Original Coordinates:', coordinates);
-        //console.log('Calculated Centroid:', centroid);
-        map.flyTo(centroid, 13); // Adjust the zoom level (13 is just an example)
+        const bounds = calculateBounds(coordinates);
+        map.flyToBounds(bounds);
         //map.flyTo([-3.9328991666666666, -38.77533916666666], 16);
       }
     }
   }, [geojson, map]);
+
+  const calculateBounds = (coordinates) => {
+    // Extract latitudes and longitudes
+    const latitudes = coordinates[0].map(([lng, lat]) => lat);
+    const longitudes = coordinates[0].map(([lng, lat]) => lng);
+
+    // Calculate the bounds
+    const bounds = [
+      [Math.min(...latitudes), Math.min(...longitudes)],
+      [Math.max(...latitudes), Math.max(...longitudes)],
+    ];
+
+    return bounds;
+  };
 
   const calculateCentroid  = (coordinates) => {
     let [sumLat, sumLng] = [0, 0];
