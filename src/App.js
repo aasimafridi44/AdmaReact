@@ -26,6 +26,7 @@ function App() {
   const steps = ['Party', 'Farm', 'Field'];
 
   const handlePartySelect = (party) => {
+    setShowImageOverlay(false)
     setSelectedParty(party);
     setSelectedFarm(null); // Clear selected farm when a new party is selected
     setSelectedField(null);
@@ -33,6 +34,7 @@ function App() {
   };
 
   const handleFarmSelect = (farm) => {
+    setShowImageOverlay(false)
     setSelectedFarm(farm);
     setSelectedField(null);
     setActiveStep(farm === null ? null: 1);
@@ -150,7 +152,9 @@ function App() {
         {selectedField && satelliteImage &&
           <>
           <Box component={"div"}  margin={2}>
-            <Button variant="outlined" margin={2} onClick={() => handleShowImage(true)}>Click button to see Image Overlay on map.</Button>
+            <Button variant="outlined" color="success" margin={2} onClick={() => handleShowImage(true)}>
+              Click button to see Image Overlay on map.
+            </Button>
           </Box>
           {showProgress && <Box component={"div"}  margin={2}>
             Please wait while satellite image getting load on map...
