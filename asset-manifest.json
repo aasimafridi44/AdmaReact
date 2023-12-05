@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/AdmaReact/static/css/main.e52fa077.css",
-    "main.js": "/AdmaReact/static/js/main.e445136a.js",
+    "main.js": "/AdmaReact/static/js/main.c68ce75a.js",
     "static/js/787.6058e193.chunk.js": "/AdmaReact/static/js/787.6058e193.chunk.js",
     "static/media/spritesheet.svg": "/AdmaReact/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
     "index.html": "/AdmaReact/index.html",
     "main.e52fa077.css.map": "/AdmaReact/static/css/main.e52fa077.css.map",
-    "main.e445136a.js.map": "/AdmaReact/static/js/main.e445136a.js.map",
+    "main.c68ce75a.js.map": "/AdmaReact/static/js/main.c68ce75a.js.map",
     "787.6058e193.chunk.js.map": "/AdmaReact/static/js/787.6058e193.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e52fa077.css",
-    "static/js/main.e445136a.js"
+    "static/js/main.c68ce75a.js"
   ]
 }
