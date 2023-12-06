@@ -65,6 +65,8 @@ function FarmList({ selectedParty, farms, onFarmSelect, isExpanded, activeStep }
           <List  sx={{ 
                 bgcolor: 'background.paper', 
                 cursor: 'pointer',
+                paddingTop: '8px',
+                paddingBottom: '0px',
                 '&:hover': {
                     backgroundColor: '#f0f0f0', // Change this to your desired hover color
                   },
