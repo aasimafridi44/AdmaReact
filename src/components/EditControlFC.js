@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react';
 import * as L from 'leaflet';
-import { FeatureGroup,  useMap } from 'react-leaflet';
+import { FeatureGroup,  useMap, ImageOverlay } from 'react-leaflet';
 import  EditControl  from './EditControl';
-import GeoTiffLayer from './GeotiffLayer'
+import { getBoundsCords }  from '../data/utils'
 
 
-const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete , control, imageOverlay, handleShowProgressImage }) => {
+const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelliteImage, onBoundaryDelete , control, imageOverlay }) => {
   const ref = React.useRef(null);
   const map = useMap();
   const [isEdit, SetIsEdit] = React.useState(false)
@@ -139,7 +139,12 @@ const EditControlFC = React.memo(({ geojson, setGeojson, onBoundarySave, satelli
     </FeatureGroup>
     {imageOverlay && !isEdit && satelliteImage &&  
       <>
-        <GeoTiffLayer url={satelliteImage} imageOverlay={imageOverlay} handleShowProgressImage={handleShowProgressImage} />
+      <ImageOverlay
+        url={satelliteImage}
+        bounds={getBoundsCords(geojson?.features[0]?.geometry?.coordinates)}
+        opacity={0.7}
+        zIndex={999}
+    />
       </> }
     </>
   );

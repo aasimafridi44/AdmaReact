@@ -21,37 +21,9 @@ function App() {
   const [activeStep, setActiveStep] = useState(null);
   const [satelliteImage, setSatelliteImage] = useState('')
   const [showImageOverlay, setShowImageOverlay] = useState(false)
-  const [showProgress, setShowProgress] = useState(false)
-  const [progressDots, setProgressDots] = useState('');
+
 
   const steps = ['Party', 'Farm', 'Field'];
-
-  useEffect(() => {
-    // Function to update progress dots
-    const updateProgressDots = () => {
-      setProgressDots((prevDots) => (prevDots.length === 3 ? '' : prevDots + '.'));
-    };
-
-    // Start updating progress dots every 500 milliseconds
-    const intervalId = setInterval(updateProgressDots, 500);
-
-    // Simulate a long-running task (Replace this with your actual callback)
-    const simulatedCallback = () => {
-      // Simulate a delay (you can replace this with your actual callback logic)
-      setTimeout(() => {
-        // Stop showing progress and clear the interval
-        setShowProgress(false);
-        clearInterval(intervalId);
-      }, 3000); // Simulating a 5-second delay
-    };
-
-    // Trigger the simulated callback
-    simulatedCallback();
-
-    // Cleanup the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []); // Empty dependency array ensures the effect runs only once on mount
-
 
   const handlePartySelect = (party) => {
     setShowImageOverlay(false)
@@ -109,7 +81,7 @@ function App() {
   };
 
   const handleLoadImage = (selectedParty, bid) => {
-
+    setShowImageOverlay(false)
     let sImage = GetSatelliteImageByBid(selectedParty, bid).then((res) =>{
       sImage = res;
       if(sImage !== ''){
@@ -122,10 +94,6 @@ function App() {
 
   const handleShowImage = (val) => {
     setShowImageOverlay(val)
-    setShowProgress(true)
-  }
-  const handleShowProgressImage = (val) => {
-    setShowProgress(val)
   }
 
   return (
@@ -175,13 +143,7 @@ function App() {
               Click here to see Overlay on map
             </Button>
            </Box>
-          {showProgress && 
-          <Box component={"div"}  margin={2}>
-            Please wait while satellite image getting load on map{progressDots}
-          </Box>
-          }
           </>
-          
         }
         </Grid>
         <Grid item xs={9}>
@@ -197,7 +159,6 @@ function App() {
               handleLoadImage={handleLoadImage}
               control={true}
               imageOverlay={showImageOverlay}
-              handleShowProgressImage={handleShowProgressImage}
               />
            
           )}
