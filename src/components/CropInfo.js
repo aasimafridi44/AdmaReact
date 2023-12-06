@@ -58,7 +58,7 @@ const CropInfo = ({ selectedParty, selectedField }) => {
           <Paper style={{margin: 1,padding: 0, border: 1}}>
             <TableContainer>
               <Table>
-                <TableHead>
+                <TableHead sx={{ backgroundColor: '#8c8c8c', '& .MuiTableCell-head': { color: 'white' } }}>
                   <TableRow>
                     <TableCell>
                       <TableSortLabel
@@ -105,13 +105,13 @@ const CropInfo = ({ selectedParty, selectedField }) => {
                   </TableRow>
                 ) :(
                 sortedCrops.map((crop, index) => (
-                            <TableRow key={index}>
-                              <TableCell>{crop.Year}</TableCell>
-                              <TableCell>{crop.crop}</TableCell>
-                              <TableCell>{crop.plantingDate}</TableCell>
-                              <TableCell>{crop.boundary}</TableCell>
-                            </TableRow>
-                          ))
+                    <TableRow key={index} sx={{ backgroundColor: index%2 === 0 ?'#e6e6e6' : '#f2f2f2'}}>
+                      <TableCell>{crop.Year}</TableCell>
+                      <TableCell>{crop.crop}</TableCell>
+                      <TableCell>{crop.plantingDate}</TableCell>
+                      <TableCell>{crop.boundary}</TableCell>
+                    </TableRow>
+                  ))
                 )}
                 </TableBody>
               </Table>
